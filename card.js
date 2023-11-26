@@ -93,7 +93,7 @@ function updateEOnSChange(cRetry) {
                             updateEOnSChange(cRetry + 1);
                     }, 200);
                 }
-                return; 
+                return;
             }
             var userCur = getUserFromCombo(comboUsers);
             if (!userCur)
@@ -301,7 +301,7 @@ function fillComboKeywords(comboKeywords, rg, kwSelected, classItem, strPrependN
             if (val == kwSelected)
                 elemOption[0].selected = true;
         }
-        
+
 
         if (classItem)
             elemOption.addClass(classItem);
@@ -370,7 +370,7 @@ function fillComboUsersWorker(comboUsers, userSelected, idCard, nameBoard, bDont
 		                callback("board not found. Sync and try again.");
 		                return;
 		            }
-                    
+
 		            getTrelloBoardMembers(idBoardFound, 1000*60*2, function (members) {
 		                for (var i = 0; i < members.length; i++) {
 		                    var member = members[i].member;
@@ -407,7 +407,7 @@ function showSEButtonBubble(elem) {
 }
 
 function createSEButton() {
-    var parent = $(".new-comment .comment-box-options");
+    var parent = $(".js-new-comment-react-root .js-react-root");
     if (parent.length == 1) {
         var a = $("<A class='comment-box-options-item agile-addSEButton' href='#' title='Add Plus S/E'>");
         var spanIcon = $("<span class='icon-sm'/>");
@@ -541,7 +541,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	var containerStats = $("<div></div>");
 	var tableStats = $("<table class='agile-se-bar-table agile-se-stats tablesorter'></table>");
 	var containerBar = $("<table class='agile-se-bar-table agile-se-bar-entry no-print'></table>");
-	
+
 	if (!g_bShowSEBar && !g_bAlwaysShowSEBar)
         containerBar.hide();
 	containerStats.append(tableStats);
@@ -573,7 +573,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	comboDays.attr("title", "Click to pick how many days ago it happened.");
 
 	fillDaysList(comboDays, 0);
-    
+
 	if (g_timeoutComboDaysUpdate == null) {
 
 	    function prepareNextCheck() {
@@ -666,7 +666,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	        });
 	    }
 	}
-	
+
 	rowStatus.append($("<td>").addClass("agile_tablecellItem agile_tablecellItemStatus")); //space for the icon on above it
 	var tdStatusPre = $("<td  style='text-align: right;' colspan='" + (bAppendKW ? "3" : "2") + "'>").addClass("agile_tablecellItem agile_tablecellItemStatus");
 	var elemStatusPre = $("<div id='agile-se-bar-status-pre' class='agile-se-bar-status'>").html("");
@@ -803,7 +803,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	}
 
 	comment.keypress(checkEnterKey);
-	
+
 	comment.bind("input", function (e) { updateCurrentSEData(); });
 	parentSEInput.before(container);
 	fillCardSEStats(tableStats, function () {
@@ -849,7 +849,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	                    sendDesktopNotification("Card has a draft s/e row (" + strWhen + ")\n• Click 'Enter', or\n• Click the timer to unpause it, or\n• Clear the bar to forget it.", 15000);
 	                }
 	            }
-	                
+
 	            showSEBarContainer();
 	        }
 	    });
@@ -940,7 +940,7 @@ function getSEDate(callback) {
             elemCommentDate.text(strMsg);
         });
     }
-    
+
     elemCommentDate = divDialog.find("#dialog_SEDate_comment");
     var strDateNow = makeDateCustomString(dateNow);
     elemDate = divDialog.find("#dialog_SEDate_date");
@@ -1083,7 +1083,7 @@ function fillCardSEStats(tableStats,callback) {
                         containerStats.prepend(estimateBadge);
                         containerStats.prepend(spentBadge);
                     }
-                    
+
                     //<span style="vertical-align: top;position: relative; top: -0.3em;font-size:0.7em">st</span>
                     var headTable = $("<thead>");
                     tableStats.append(headTable);
@@ -1281,7 +1281,7 @@ function showSETotalEdit(idCardCur, user) {
 
     var comboKeyword = divDialog.find(".agile_mtse_keywords");
     var elemKwLink = divDialog.find(".agile_mtse_kwReportLink");
-    
+
     var bHideComboKeyword=true;
     if (g_optEnterSEByComment.IsEnabled()) {
         var rgkeywords = g_optEnterSEByComment.getAllKeywordsExceptLegacy();
@@ -1300,7 +1300,7 @@ function showSETotalEdit(idCardCur, user) {
         var idCard = getIdCardFromUrl(document.URL);
         elemKwLink.attr("href", chrome.extension.getURL("report.html?chartView=s&idCard=" + encodeURIComponent(idCard) + "&orderBy=keyword&user=" + user + "&sortList=%5B%5B%22Keyword%22%2C0%5D%2C%5B%22Date%22%2C1%5D%5D"));
     }
-    
+
     var elemTitle = divDialog.find(".agile_mtse_title");
     elemTitle.html("Modify total S/E for " + user);
     function setSEVal(elem, val) {
@@ -1395,7 +1395,7 @@ function showSETotalEdit(idCardCur, user) {
             strMessageNew=strMessageInitial;
         else
             strMessageNew = "" + data.s + "/" + data.e + " will be added to " + user + " in a new S/E row.";
-        
+
         elemMessage.text(strMessageNew);
         if (bUpdateR) {
             var valNew = parseFixedFloat(eOrigNum + data.e - sOrigNum - data.s);
@@ -1517,7 +1517,7 @@ function addCardSERowData(tableStats, rowData, bHeader) {
 	var eVal = (typeof (rowData.est) == 'string' ? rowData.est : parseFixedFloat(rowData.est));
 	var rVal =  (typeof (rowData.remain) == 'string' ? rowData.remain : parseFixedFloat(eVal - sVal));
 	var s = $(td);
-	
+
 	var e = $(td).addClass("agile-card-now-estimate-header");
 	var r = $(td);
 	if (g_bNoEst) {
@@ -1525,7 +1525,7 @@ function addCardSERowData(tableStats, rowData, bHeader) {
 	    r.hide();
 	}
 	var linkMod = $(td).addClass("agile-card-seByUserModify");
-	
+
 	if (bHeader) {
 	    u.attr("title", "Click on a user to view a detailed drilldown report");
 	    s.html(sVal + g_hackPaddingTableSorter).attr("title", "Spent sum per user");
@@ -1603,7 +1603,7 @@ function addCardSERowData(tableStats, rowData, bHeader) {
 	            var maxNote = 50;
 	            var sql = "select H.keyword, H.spent, H.est, H.date, H.week, h.comment FROM HISTORY AS H WHERE H.idCard=? and user=? order by date DESC, rowid DESC LIMIT "+(maxRows+1);
 	            var values = [idCardCur, rowData.user];
-	            
+
 	            getSQLReport(sql, values, function (response) {
 	                var strTitle = "";
 	                var bMultipleKeywords = g_optEnterSEByComment.IsEnabled() && g_optEnterSEByComment.getAllKeywordsExceptLegacy().length > 1;
@@ -1674,7 +1674,7 @@ function recalcChecklistTotals() {
     var checks = $(".checklist-item-details-text");
     var s = 0;
     var e = 0;
-    
+
     checks.each(function (i, elem) {
         var se = parseSE(elem.textContent, true);
         if (se.bParsed) {
@@ -1726,12 +1726,12 @@ function addCardCommentHelp() {
 		var board = getCurrentBoard();
 		if (board == null)
 		    return; //wait til later
-        
+
 		var idCardCur = getIdCardFromUrl(document.URL);
 		if (!idCardCur)
 		    return; //timing issue, really shouldnt happen as we found card elements above
 
-        //simply so in case idBoard(Short) isnt cached, go get it from the api and cache it so its ready when the S/E is entered by the user 
+        //simply so in case idBoard(Short) isnt cached, go get it from the api and cache it so its ready when the S/E is entered by the user
 		FindIdBoardFromBoardName(board, idCardCur, function (idBoardFound) { });
 
 		for (i = 0; i < elems.length; i++) {
@@ -1748,7 +1748,7 @@ function addCardCommentHelp() {
 				createHashtagsList(div);
 				createSEMenu(div);
 				elemWindowTop.find(".window-header").eq(0).append(div);
-				
+
 				createCardSEInput(elemParent, idCardCur, board);
 				break;
 			}
@@ -1763,7 +1763,7 @@ function checkCardRecurringCheckbox() {
     var elemTitle = $(".card-detail-title-assist");
     if (elemTitle.length == 0)
         return;
-    
+
     var checkbox = $("#agile_checkRecurringCard");
     if (checkbox.length == 0)
         return;
@@ -2006,7 +2006,7 @@ function createHashtagsList(divParent) {
                 alert(response.status);
                 return;
             }
-            
+
             listCached = cloneObject(response.list);
             loadAllAndOpen();
         });
@@ -2111,7 +2111,7 @@ function createHashtagsList(divParent) {
 
 var Card = {
 	//
-	// Separator used to split the custom values 
+	// Separator used to split the custom values
 	// from the rest of the title
 	//
 	mainSeparator: ")",
@@ -2124,7 +2124,7 @@ var Card = {
 	hashtagsFromTitle: function (title) {
 	    return getHashtagsFromTitle(title);
 	},
-	
+
 	estimationLabelText: function (estimationNumber) {
 		return "E: " + String(estimationNumber);
 	},
@@ -2135,8 +2135,7 @@ var Card = {
 		return "R: " + String(number);
 	},
 	titleTag: function (card) {
-		var details = $(card).children('.list-card-details');
-		return details.eq(0).children('.list-card-title').eq(0);
+        return $(card).find('[data-testid="card-name"]').eq(0);
 	}
 };
 
@@ -2166,7 +2165,7 @@ function loadCardTimer(idCard) {
 			    setTimeout(function () {
 			        showTimerPopup(idCard); //wait a little since the trello card window is loading
 			    }, 500);
-			    
+
 				var date = new Date();
 				msEnd = date.getTime();
 			}
@@ -2189,7 +2188,7 @@ function loadCardTimer(idCard) {
 	return timerElem;
 }
 
-var g_cHilitesTimer = 0; //if its 
+var g_cHilitesTimer = 0; //if its
 function checkNeedHiliteTimer() {
     chrome.storage.local.get(LOCALPROP_bHiliteTimerOnOpenCard, function (obj) {
         var value = obj[LOCALPROP_bHiliteTimerOnOpenCard];
@@ -2363,7 +2362,7 @@ function handleCardTimerClick(msDateClick, hash, timerElem, timerStatus, idCard,
                 var bRemoveActive = (idCardActiveTimer && idCardActiveTimer == idCard);
                 if (bRemoveActive)
                     rgRemove.push(SYNCPROP_ACTIVETIMER);
-            
+
                 chrome.storage.sync.remove(rgRemove, function () {
                     if (chrome.runtime.lastError !== undefined)
                         return;
@@ -2462,7 +2461,7 @@ function setNewCommentInCard(idCardCur, keywordUse, //blank uses default (first)
 
 	s = Math.round(s * 100) / 100;
 	e = Math.round(e * 100) / 100;
-	
+
 	comment = keywordUse + " ";
 
 	if (memberTransferTo) {
@@ -2508,7 +2507,7 @@ function setNewCommentInCard(idCardCur, keywordUse, //blank uses default (first)
 function HandleNoBackendDbEntry(s, e, commentBox, idBoard, idCard, strDays, strBoard, cleanTitle, userCur, memberTransferTo, idHistoryRowUse, keyword, callback) {
 	var dateNow = new Date();
 	var dDays = 0;
-	
+
 	if (strDays != "") {
 		dDays = parseInt(strDays, 10) || 0;
 		if (dDays < 0 && dDays >= g_dDaysMinimum) {
@@ -2568,7 +2567,7 @@ function doEnterSEIntoCard(s, e, commentBox, comment, idBoard, idCard, strDays, 
 	        //legacy option to rename card titles. Keep it on if user has configured google sync and hasnt configured reading S/E from comments
 	        //note that we dont rename card titles if there is no service url. this can affect a few users, but its best because it avoids issues with new
 	        //team users that never enable sync and just start using Plus without any configuration.
-            
+
             var estimation = parseFixedFloat(e + se.estimate);
 	        var spent = parseFixedFloat(s + se.spent);
 
@@ -2580,7 +2579,7 @@ function doEnterSEIntoCard(s, e, commentBox, comment, idBoard, idCard, strDays, 
 	        commentEnter = comment;
 	    }
 	}
-	
+
 	handleEnterCardComment(titleCardNew, commentEnter, strBoard, idBoard, idCard, s, e, commentBox, strDays, cleanTitle, keyword, member, memberTransferTo, onBeforeStartCommit, onFinished);
 }
 
@@ -2617,7 +2616,7 @@ function handleEnterCardComment(titleCard, comment, strBoardParam, idBoardParam,
                 var idBoard = response.commentObj.data.board.shortLink; //this is fresher than idBoardParam
                 var strBoard = response.commentObj.data.board.name; //fresher than strBoard param
                 var idHistoryRowUse = response.commentObj.id;
-                postAddCardComment(idBoard, strBoard, idHistoryRowUse); 
+                postAddCardComment(idBoard, strBoard, idHistoryRowUse);
             });
         }
 
@@ -2683,7 +2682,7 @@ function addCardCommentByApi(idCard, comment, callback, waitRetry) {
                         objRet.status = errFromXhr(xhr);
                     }
                 }
-                
+
                 if (!bReturned)
                 callback(objRet);
         }
@@ -2779,7 +2778,7 @@ function FindIdBoardFromBoardName(boardNameNew, idCard, callback) {
 		            });
 		        }
 		    });
-		    
+
 		} else {
 			callback(value.idBoard);
 		}
@@ -2935,7 +2934,7 @@ function showSEHelpDialog(section) {
 </dialog>');
         getDialogParent().append(divDialog);
         divDialog = $(".agile_dialog_SEHelp");
-    } 
+    }
 
     function doFinish(bOK) {
         divDialog[0].close();

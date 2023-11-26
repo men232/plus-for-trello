@@ -6,7 +6,7 @@ var LabelsManager = {
     },
     update: function (card) {
         var color = "white";
-        var firstLabel = card.find('div.list-card-labels').children(':first');
+        var firstLabel = card.find('[data-testid="compact-card-label"]').children(':first');
         if (firstLabel.size()) {
             var backgroundColor = firstLabel.css('background-color');
             var m = backgroundColor.match(this.g_regexMatch);

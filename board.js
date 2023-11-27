@@ -90,7 +90,7 @@ function updateCardsWorker(boardCur, responseParam, bShowBoardTotals, defaultSE,
             
             function bUpdateTitle() {
                 originalTitleTag = Card.titleTag(card);
-                if (originalTitleTag.length == 0 || !card.href) {
+                if (originalTitleTag.length == 0 ) {
                     bResetHtmlLast = true;
                     return false;
                 }
@@ -209,7 +209,7 @@ function updateCardsWorker(boardCur, responseParam, bShowBoardTotals, defaultSE,
             //
             // Card Badges
             //
-            var badges = $(card).children('.list-card-details').eq(0).children('.badges');
+            var badges = $($(card).find('[data-testid="card-front-badges"]').eq(0));
             var bNoBadges = (spent == 0 && estimation == 0);
             var remain = parseFixedFloat(estimation - spent);
             var szClassSEFromTitle="agile_seFromTitle";
@@ -283,7 +283,7 @@ function updateCardsWorker(boardCur, responseParam, bShowBoardTotals, defaultSE,
                     var imgRecurring = $("<img class='agile_image_recurring_back'>").attr("src", chrome.extension.getURL("images/recurring.png"));
                     imgRecurring.attr("title", "Recurring card");
                     elRecurring = $("<span>").addClass("agile_recurring").hide();
-                     elRecurring.append(imgRecurring);
+                    elRecurring.append(imgRecurring);
                     badges.append(elRecurring);
                 }
 
@@ -362,12 +362,13 @@ function updateCardsWorker(boardCur, responseParam, bShowBoardTotals, defaultSE,
 
         //
         // List Spent box
-        //	
+        //
         var h2SiblinsSpentBox = listCur.find('.agile_spent_box');
         if (h2SiblinsSpentBox.size() == 0) {
             spentBox = InfoBoxFactory.makeInfoBox(SPENT).hide().addClass("agile_badge_list");
             divSE.prepend(spentBox);
-            listCur.find(".list-header-extras").prepend(divSE); //not h2.after(divSE) because that would cause the "subscribed to list" icon to drop below
+            var buttonBefore=listCur.find('[data-testid="list-header"] > button').eq(0);
+            divSE.insertBefore(buttonBefore);
 
         } else {
             spentBox = h2SiblinsSpentBox.eq(0);
@@ -715,10 +716,10 @@ function getKeySEFromBoard(board) {
 
 
 function updateBoardSEStorage(boardCur, spent, estimate) {
-	var date = new Date();
-	var key = getKeySEFromBoard(boardCur);
-	var value = { s: spent, e: estimate, t: date.getTime() }; //make the names small so it consumes less storage quota
-	doSaveBoardValues(value, key);
+    var date = new Date();
+    var key = getKeySEFromBoard(boardCur);
+    var value = { s: spent, e: estimate, t: date.getTime() }; //make the names small so it consumes less storage quota
+    doSaveBoardValues(value, key);
 }
 
 function doSaveBoardValues(value, key) {
@@ -747,19 +748,29 @@ function getCurrentBoard() {
 
 var List = {
     all: function () {
-        return $('.list-header-name');
+        return $('[data-testid="list-header"]');
     },
     cards: function (list) {
         var cardsContainer = $(list).parent();
-        cardsContainer = cardsContainer.siblings('.list-cards').eq(0);
-        var cards = $(cardsContainer).children('.list-card');
+        cardsContainer = cardsContainer.children('[data-testid="list-cards"]');
+        var cards = $(cardsContainer).find('[data-testid="trello-card"]');
         return cards;
     }
 };
 
 var InfoBoxManager = {
     update: function () {
-        var boardHeader = $('.board-header');
+        // ----------- FIX-TRELLO boardHeader 2023-05-21 ------------ //
+        var boardHeader = $('.board-header .js-react-root > div >span:nth-of-type(2)');
+        var $agileMenu = $("#added_agile_menu");
+        if ($agileMenu.length>0){
+            boardHeader = $agileMenu;
+        }else{
+            var box = $('<div id="added_agile_menu"></div>');
+            boardHeader.prepend(box);
+            boardHeader = box;
+        }
+        // ----------- FIX-TRELLO boardHeader 2023-05-21  ------------ //
 
         if (boardHeader.length != 1)
             return;

@@ -2,29 +2,39 @@ import { SQLocal } from "./sqlocal/index.js";
 
 const noop = () => {};
 
-function callSafe(...fns) {
+async function callSafe(...fns) {
   for (const fn of fns) {
     try {
       fn();
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
-const persist = async () => {
-  console.log("setting persistence...");
-  return (
-    (await navigator.storage) &&
-    navigator.storage.persist &&
-    navigator.storage.persist()
+const getSystemValue = async (client, key) => {
+  const { rows } = await client.exec("SELECT value FROM _sysdata WHERE key=?", [
+    key,
+  ]);
+
+  return rows?.[0]?.[0];
+};
+
+const setSystemValue = async (client, key, value) => {
+  await client.exec(
+    `INSERT OR REPLACE INTO _sysdata (key,value) VALUES (?,?)`,
+    [key, value]
   );
 };
 
-const isStoragePersisted = async () => {
-  console.log("checking persistence...");
-  return (
-    (await navigator.storage) &&
-    navigator.storage.persisted &&
-    navigator.storage.persisted()
+const setupSystemStorage = async (client) => {
+  await client.exec(
+    `CREATE TABLE IF NOT EXISTS _sysdata (
+    key TEXT PRIMARY KEY  NOT NULL,
+    value TEXT NOT NULL
+  )`,
+    [],
+    "all"
   );
 };
 
@@ -39,8 +49,32 @@ window.openDatabase = async (name) => {
 
   console.info("Database loaded.");
 
+  await setupSystemStorage(client);
+
+  let version = "0";
+
+  const lsDbVersionKey = `sqlite.${name}.db_version`;
+
+  const knownVersion = await getSystemValue(client, "db_version");
+  const cachedVersion = localStorage.getItem(lsDbVersionKey);
+
+  if (knownVersion !== cachedVersion) {
+    if (knownVersion && !cachedVersion) {
+      console.warn("Restore cached db_version =", knownVersion);
+      localStorage.setItem(lsDbVersionKey, knownVersion);
+      version = knownVersion;
+    } else {
+      console.warn("Drop db_version");
+      await setSystemValue(client, "db_version", "0");
+      localStorage.setItem(lsDbVersionKey, "0");
+      version = "0";
+    }
+  } else {
+    version = knownVersion;
+  }
+
   const api = {
-    version: localStorage.getItem("plus_db_version") ?? "0",
+    version,
     changeVersion(
       oldVersion,
       newVersion,
@@ -50,11 +84,16 @@ window.openDatabase = async (name) => {
     ) {
       const tx = createTransaction();
 
-      tx.onComplete = () => {
+      tx.onComplete = async () => {
         this.version = String(newVersion);
-        localStorage.setItem("plus_db_version", newVersion);
 
-        if (successCallback) callSafe(() => successCallback());
+        await setSystemValue(client, "db_version", newVersion);
+
+        localStorage.setItem(lsDbVersionKey, newVersion);
+
+        if (successCallback) {
+          await callSafe(() => successCallback());
+        }
       };
 
       tx.onError = errorCallback;
@@ -83,10 +122,12 @@ window.openDatabase = async (name) => {
     );
 
     for (const row of rows) {
-      if (row.name.startsWith('sqlite_')) continue;
+      if (row.name.startsWith("sqlite_")) continue;
 
       await _execute(`DROP TABLE ${row.name}`);
     }
+
+    await setupSystemStorage(client);
   }
 
   return api;
@@ -146,7 +187,7 @@ window.openDatabase = async (name) => {
 
           return _execute("COMMIT;")
             .then(() => {
-              callSafe(
+              return callSafe(
                 () => this.onComplete(),
                 () => this.onFinally()
               );
@@ -156,7 +197,7 @@ window.openDatabase = async (name) => {
 
               this.status = "failed";
 
-              callSafe(
+              return callSafe(
                 () => this.onError(err),
                 () => this.onFinally()
               );
@@ -165,7 +206,9 @@ window.openDatabase = async (name) => {
 
         _execute(q.sql, q.values)
           .then((results) => {
-            if (q.callback) callSafe(() => q.callback(tx, results));
+            if (q.callback) {
+              callSafe(() => q.callback(tx, results));
+            }
           })
           .then(() => this._drainSchedule())
           .catch((err) => {
@@ -186,7 +229,7 @@ window.openDatabase = async (name) => {
 
             return _execute("ROLLBACK;")
               .then(() => {
-                callSafe(
+                return callSafe(
                   () => this.onError(err),
                   () => this.onFinally()
                 );

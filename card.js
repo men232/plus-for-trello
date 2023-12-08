@@ -1718,11 +1718,10 @@ function addCardCommentHelp() {
 	if (!g_bReadGlobalConfig)
 		return; //wait til later
 
-	var elems = $(".new-comment");
-	var i = 0;
+	const isSEInputInitialized = !!document.querySelector('.' + g_inputSEClass);
 
 	//create S/E bar if not there yet
-	if ($("." + g_inputSEClass).length == 0) {
+	if (!isSEInputInitialized) {
 		var board = getCurrentBoard();
 		if (board == null)
 		    return; //wait til later
@@ -1734,23 +1733,23 @@ function addCardCommentHelp() {
         //simply so in case idBoard(Short) isnt cached, go get it from the api and cache it so its ready when the S/E is entered by the user
 		FindIdBoardFromBoardName(board, idCardCur, function (idBoardFound) { });
 
-		for (i = 0; i < elems.length; i++) {
-			var elem = elems.eq(i);
-			var elemParent = elem;
+		const windowElements = document.querySelectorAll('.window-wrapper');
 
-			if (true) {
-				var classSpentCommentHelp = "agile_plushelp_cardCommentHelp";
-				var elemWindowTop = elemParent;
-				while (!elemWindowTop.hasClass("window-wrapper"))
-				    elemWindowTop = elemWindowTop.parent();
-				var div = $("<div class='no-print'></div>");
+		for (const windowEl of windowElements) {
+			const newCommentElement = windowEl.querySelector('.new-comment');
+			const windowHeaderElement = windowEl.querySelector('.window-header');
+
+			if (newCommentElement) {
+				createCardSEInput($(newCommentElement), idCardCur, board);
+			}
+
+			if (windowHeaderElement) {
+				const div = $("<div class='no-print'></div>");
 				div.append(createRecurringCheck());
 				createHashtagsList(div);
 				createSEMenu(div);
-				elemWindowTop.find(".window-header").eq(0).append(div);
 
-				createCardSEInput(elemParent, idCardCur, board);
-				break;
+				windowHeaderElement.append(div[0]);
 			}
 		}
 	}

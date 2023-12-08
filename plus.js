@@ -74,7 +74,6 @@ var g_waiterLi = CreateWaiter(2, function () {
     checkFirstTimeUse(function (bShowedDialog) {
         if (bShowedDialog)
 			return;
-		checkDownWarning();
         checkNeedsExtensionUpdate(function (bShowedDialog) { //review: should also check regularly for users that never close the trello tab
             if (bShowedDialog)
                 return;
@@ -2689,69 +2688,6 @@ function testModifySyncStorageUrl(url) {
         }
     });
 }
-
-//*************** */
-function checkDownWarning() {
-	const PROP_LS_MSLASTDOWNWARN = "MSLastTDOWNWARN";
-	const MSDELTA_DOWNWARN = 1000 * 60 * 60 * 24 * 0.8;
-	const msNow = Date.now();
-
-	if (true) {
-		var msLast = parseInt(localStorage.getItem(PROP_LS_MSLASTDOWNWARN) || "0", 10) || 0;
-
-		if (msNow - msLast < MSDELTA_DOWNWARN)
-			return;
-	}
-
-	showkDownWarning(function (bOK) {
-		localStorage.setItem(PROP_LS_MSLASTDOWNWARN, msNow.toString());
-	});
-}
-
-function showkDownWarning(callback) {
-	var divDialog = $("#agile_dialog_DownWarning");
-
-	function doCloseDialog(callbackAfter) {
-		divDialog.removeClass("agile_dialog_Postit_Anim_ShiftToShow");
-		setTimeout(function () {
-			divDialog[0].close();
-			if (callbackAfter)
-				callbackAfter();
-		}, 300); //wait for animation to complete
-	}
-
-	if (divDialog.length == 0) {
-		//focus on h2 so it doesnt go to the first link
-		divDialog = $('\
-<dialog id="agile_dialog_DownWarning" style="cursor:pointer;padding-bottom:6px;padding-top:6px;text-align: center;width:21em;" class="agile_dialog_DefaultStyle agile_dialog_Postit agile_dialog_Postit_Anim">\
-<div tabindex="1" style="outline: none;cursor:pointer;margin-top:0em;"><span><B>🟡 NOTE: Plus for Trello is getting a new owner!</B></span></div> \
-<div> \
-Hi! Soon a new owner will take and continue developing Plus<br><br>\
-One of the first things the new owner will do is to remove the dependency from "web SQL" which \
-Plus relies on and <A target="_blank" href="https://developer.chrome.com/blog/deps-rems-101/#remove-websql-in-third-party-contexts">might go away soon</A><br>	\
-so as a precaution you should backup your Plus data as follows:</div> \
-<div> <br>\
-To export all your S/E data open <A target="_blank" href="'+ chrome.extension.getURL("report.html?pivotBy=year&orderBy=date&archived=-1&deleted=-1")+'">this report</A> and export it to excel or CSV.\
-<br><A href="https://www.plusfortrello.com/2022/05/going-down.html" target="_blank"> More information</A>\
-</div > \
-			 <br>\
-<div> <button style="display:inline-block;padding:0;margin-left:1em;margin-top:0;margin-bottom:0;width:3em;min-height:0.5em;">OK</button></div> \
-			 <br>\
-						  </dialog>');
-		divDialog.find("button").off("click.plusForTrello").on("click.plusForTrello", function (e) {
-			e.preventDefault();
-			doCloseDialog(function () {
-				callback(STATUS_OK, true);
-			});
-		});
-	getDialogParent().append(divDialog);
-	}
-
-	showModlessDialog(divDialog[0]);
-	setTimeout(function () { divDialog.addClass("agile_dialog_Postit_Anim_ShiftToShow"); }, 200); //some dialog conflict prevents animation from working without timeout
-}
-	/************************************************************* */
-
 
 var g_bShowedTryPro = false;
 var g_bForceShowTry = false; //for testing only

@@ -1733,7 +1733,7 @@ function addCardCommentHelp() {
         //simply so in case idBoard(Short) isnt cached, go get it from the api and cache it so its ready when the S/E is entered by the user
 		FindIdBoardFromBoardName(board, idCardCur, function (idBoardFound) { });
 
-		const windowElements = document.querySelectorAll('.window-wrapper');
+		const windowElements = document.querySelectorAll('.card-detail-window');
 
 		for (const windowEl of windowElements) {
 			const newCommentElement = windowEl.querySelector('.new-comment');

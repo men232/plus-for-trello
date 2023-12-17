@@ -1,16 +1,7 @@
+import { createExecutor } from "./createExecutor.mjs";
+import { createTransaction } from "./createTransaction.mjs";
+import { queueJob } from "./scheduler.mjs";
 import { SQLocal } from "./sqlocal/index.js";
-
-const noop = () => {};
-
-async function callSafe(...fns) {
-  for (const fn of fns) {
-    try {
-      fn();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-}
 
 const getSystemValue = async (client, key) => {
   const { rows } = await client.exec("SELECT value FROM _sysdata WHERE key=?", [
@@ -73,6 +64,9 @@ window.openDatabase = async (name) => {
     version = knownVersion;
   }
 
+  const _execute = createExecutor(client);
+  const _createTransaction = createTransaction(client);
+
   const api = {
     version,
     changeVersion(
@@ -82,36 +76,51 @@ window.openDatabase = async (name) => {
       errorCallback,
       successCallback
     ) {
-      const tx = createTransaction();
+      const tx = _createTransaction();
 
-      tx.onComplete = async () => {
+      tx.onComplete.push(async () => {
         this.version = String(newVersion);
 
         await setSystemValue(client, "db_version", newVersion);
 
         localStorage.setItem(lsDbVersionKey, newVersion);
+      });
 
-        if (successCallback) {
-          await callSafe(() => successCallback());
-        }
-      };
+      if (handler) {
+        tx.onInitial.push(handler);
+      }
 
-      tx.onError = errorCallback;
-      tx._drainSchedule();
+      if (successCallback) {
+        tx.onComplete.push(successCallback);
+      }
 
-      handler(tx);
+      if (errorCallback) {
+        tx.onError.push(errorCallback);
+      }
+
+      tx.run();
     },
     executeSql(sql, values, callback, errorCallback) {
-      _execute(sql, values).then(callback).catch(errorCallback);
+      queueJob(() =>
+        _execute(sql, values, true).then(callback).catch(errorCallback)
+      );
     },
     transaction(handler, errorCallback, successCallback) {
-      const tx = createTransaction();
+      const tx = _createTransaction();
 
-      tx.onComplete = successCallback;
-      tx.onError = errorCallback;
-      tx._drainSchedule();
+      if (handler) {
+        tx.onInitial.push(handler);
+      }
 
-      handler(tx);
+      if (errorCallback) {
+        tx.onError.push(errorCallback);
+      }
+
+      if (successCallback) {
+        tx.onComplete.push(successCallback);
+      }
+
+      tx.run();
     },
   };
 
@@ -131,116 +140,4 @@ window.openDatabase = async (name) => {
   }
 
   return api;
-
-  async function _execute(sql, values) {
-    if (!Array.isArray(values)) {
-      values = values !== undefined ? [values] : [];
-    }
-
-    console.log("[SQL]", sql);
-
-    const [raws, rawsLastRowId, rawsChanges] = await Promise.all([
-      client.exec(sql, values, "all"),
-      client.exec("SELECT last_insert_rowid()", [], "all"),
-      client.exec("SELECT changes()", [], "all"),
-    ]);
-
-    let insertId = rawsLastRowId?.rows?.[0]?.[0] ?? null;
-    let rowsAffected = rawsChanges?.rows?.[0]?.[0] ?? 0;
-
-    const rows = client.convertRowsToObjects(raws.rows, raws.columns);
-
-    const result = { rows, insertId, rowsAffected };
-
-    return result;
-  }
-
-  function createTransaction() {
-    const tx = {
-      queries: [{ sql: "BEGIN TRANSACTION;", values: [] }],
-      status: "active",
-      onComplete: noop,
-      onError: noop,
-      onFinally: noop,
-      executeSql(sql, values, callback, errorCallback) {
-        if (this.status !== "active") {
-          throw new Error("Transaction are " + this.status);
-        }
-
-        this.queries.push({
-          sql,
-          values,
-          callback,
-          errorCallback,
-        });
-      },
-      _drainSchedule() {
-        setTimeout(this._drain.bind(this), 1);
-      },
-      _drain() {
-        if (this.status !== "active") return;
-
-        const q = this.queries.shift();
-
-        if (!q) {
-          this.status = "completed";
-
-          return _execute("COMMIT;")
-            .then(() => {
-              return callSafe(
-                () => this.onComplete(),
-                () => this.onFinally()
-              );
-            })
-            .catch((err) => {
-              console.error("Failed to commit transaction.", err);
-
-              this.status = "failed";
-
-              return callSafe(
-                () => this.onError(err),
-                () => this.onFinally()
-              );
-            });
-        }
-
-        _execute(q.sql, q.values)
-          .then((results) => {
-            if (q.callback) {
-              callSafe(() => q.callback(tx, results));
-            }
-          })
-          .then(() => this._drainSchedule())
-          .catch((err) => {
-            if (q.errorCallback) {
-              callSafe(() => q.errorCallback(tx, err));
-            } else {
-              console.warn(
-                "[SQL]",
-                err,
-                "\nQuery:\n",
-                q.sql,
-                "\nValues:\n",
-                q.values
-              );
-            }
-
-            this.status = "error";
-
-            return _execute("ROLLBACK;")
-              .then(() => {
-                return callSafe(
-                  () => this.onError(err),
-                  () => this.onFinally()
-                );
-              })
-              .catch((err) => {
-                console.error("Failed to rollback transaction.", err);
-              });
-          });
-      },
-    };
-
-    return tx;
-  }
 };

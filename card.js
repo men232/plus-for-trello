@@ -1042,7 +1042,7 @@ function fillCardSEStats(tableStats,callback) {
 				ORDER BY CB.date DESC";
         var values = [idCard];
 
-        if (g_optEnterSEByComment.IsEnabled() && g_optEnterSEByComment.rgKeywords.length>1) {
+        if (g_optEnterSEByComment.IsEnabled() && g_optEnterSEByComment.rgKeywords.length>0) {
             sql = "select H.keyword, H.idCard, H.user, SUM(H.spent) as spent, SUM(H.est) as est, MAX(H.date) as date FROM HISTORY AS H WHERE H.idCard=? \
             group by user,keyword \
             order by date DESC, rowid DESC";

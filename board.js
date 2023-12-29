@@ -761,7 +761,7 @@ var List = {
 var InfoBoxManager = {
     update: function () {
         // ----------- FIX-TRELLO boardHeader 2023-05-21 ------------ //
-        var boardHeader = $('.board-header > div >span:nth-of-type(2)');
+        var boardHeader = $('.board-header > div > div >span:nth-of-type(2)');
         var $agileMenu = $("#added_agile_menu");
         if ($agileMenu.length>0){
             boardHeader = $agileMenu;

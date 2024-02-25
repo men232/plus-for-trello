@@ -551,9 +551,9 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	var rowStatus = $("<tr>").addClass("agile-card-background");
 	var rowPad = $("<tr>").addClass("agile-card-background").append($("<td style='font-size:50%;'>&nbsp;</td>").addClass("agile_tablecellItem"));
 
-	containerBar.append(row).append(rowStatus).append(rowPad);
+	containerBar.append($('<tbody class="agile-card-background">')).append(row).append(rowStatus).append(rowPad);
 
-	var comboUsers = setSmallFont($('<select id="plusCardCommentUsers"></select>').addClass("agile_general_box_input"));
+	var comboUsers = setSmallFont($('<select id="plusCardCommentUsers"></select>').addClass("agile_general_box_input agile_combo_input"));
 	comboUsers.attr("title", "Click to select the user for this new S/E row.");
 	fillComboUsers(true, comboUsers, "", idCardCur, board);
 	comboUsers.change(function () {
@@ -569,7 +569,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	        rememberSEUser(val);
 	});
 
-	var comboDays = setSmallFont($('<select id="plusCardCommentDays"></select>').addClass("agile_days_box_input"));
+	var comboDays = setSmallFont($('<select id="plusCardCommentDays"></select>').addClass("agile_days_box_input agile_combo_input"));
 	comboDays.attr("title", "Click to pick how many days ago it happened.");
 
 	fillDaysList(comboDays, 0);
@@ -621,19 +621,19 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	            });
 	        }
 	});
-	var spinS = setNormalFont($('<input id="plusCardCommentSpent" placeholder="S" maxlength="10"></input>').addClass("agile_spent_box_input agile_placeholder_small agile_focusColorBorder"));
+	var spinS = setNormalFont($('<input id="plusCardCommentSpent" placeholder="S" maxlength="10"></input>').addClass("agile_spent_box_input agile_placeholder_small agile_text_input"));
 	spinS.attr("title", "Click to type Spent.\nIf needed, Plus will increase E (right) when your total S goes over E.");
 	spinS[0].onkeypress = function (e) { validateSEKey(e); checkEnterKey(e); };
     //thanks for "input" http://stackoverflow.com/a/14029861/2213940
 	spinS.bind("input", function (e) { updateEOnSChange(); });
-	var spinE = setNormalFont($('<input id="plusCardCommentEstimate" placeholder="E" maxlength="10"></input>').addClass("agile_estimation_box_input agile_placeholder_small agile_focusColorBorder"));
+	var spinE = setNormalFont($('<input id="plusCardCommentEstimate" placeholder="E" maxlength="10"></input>').addClass("agile_estimation_box_input agile_placeholder_small agile_text_input"));
 	var spanSpinE = $('<span>');
 	spanSpinE.append(spinE);
 	spinE.attr("title", "Click to type Estimate.");
 	spinE[0].onkeypress = function (e) { validateSEKey(e); checkEnterKey(e); };
 	spinE.bind("input", function (e) { updateNoteR(); });
 	var slashSeparator = setSmallFont($("<span>").text("/"));
-	var comment = setNormalFont($('<input type="text" maxlength="250" name="Comment" placeholder="note"/>').attr("id", "plusCardCommentComment").addClass("agile_comment_box_input agile_placeholder_small"));
+	var comment = setNormalFont($('<input maxlength="250" name="Comment" placeholder="Comment"/>').attr("id", "plusCardCommentComment").addClass("agile_comment_box_input agile_placeholder_small agile_text_input"));
 
 	if (g_bNoEst) {
 	    slashSeparator.addClass("agile_hidden");
@@ -648,7 +648,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	icon.addClass("agile-spent-icon-cardcommentSE");
 	spanIcon.append(icon);
 
-	var buttonEnter = setSmallFont($('<button id="plusCardCommentEnterButton"/>').addClass("agile_enter_box_input").text("Enter"));
+	var buttonEnter = setSmallFont($('<button id="plusCardCommentEnterButton"/>').addClass("agile_enter_box_input").addClass("agile_buton").text("Enter"));
 	buttonEnter.attr('title', 'Click to enter this S/E.');
 	row.append($('<td />').addClass("agile_tablecellItem").append(spanIcon));
 	var bAppendKW = false;
@@ -1097,7 +1097,7 @@ function fillCardSEStats(tableStats,callback) {
                     };
 
                     var rowHeader = addCardSERowData(headTable, dataRowHeader, true);
-                    var bodyTable = $("<tbody>");
+                    var bodyTable = $('<tbody class="agile-card-background">');
                     bModifiedHeaderE = false;
                     var sTotalCard = 0;
                     var eTotalCard = 0;
@@ -1208,24 +1208,26 @@ function showSETotalEdit(idCardCur, user) {
 <a class="agile_mtse_kwReportLink agile_linkSoftColor" href="" target="_blank">view keyword report</a> \
 <br>Date to modify: <select class="agile_mtse_day"></select>\
 <table class="agile_seTotalTable"> \
+<tbody class="agile-card-background"> \
 <tr> \
 <td align="left">S sum</td> \
 <td align="left">E sum</td> \
 <td align="left">R</td> \
 </tr> \
 <tr> \
-<td align="left"><input class="agile_modify_total_se_input agile_mtse_s" maxlength="10"></input></td> \
-<td align="left"><input class="agile_modify_total_se_input agile_mtse_e" maxlength="10"></input></td> \
-<td align="left"><input class="agile_modify_total_se_input agile_mtse_r" maxlength="10"></input></td> \
+<td align="left"><input class="agile_modify_total_se_input agile_mtse_s agile_text_input" maxlength="10"></input></td> \
+<td align="left"><input class="agile_modify_total_se_input agile_mtse_e agile_text_input" maxlength="10"></input></td> \
+<td align="left"><input class="agile_modify_total_se_input agile_mtse_r agile_text_input" maxlength="10"></input></td> \
 <td title="change your units from Plus Preferences" align="left"><span class="agile_mtse_units"></span></td> \
 </tr> \
+</tbody> \
 </table> \
-<input class="agile_se_note agile_placeholder_small" placeholder="type an optional note" maxlength="250"></input> \
-<button id="agile_modify_SETotal">Modify</button> \
-<button id="agile_cancel_SETotal">Cancel</button> \
+<input class="agile_se_note agile_placeholder_small agile_text_input" placeholder="type an optional note" maxlength="250"></input> \
+<button id="agile_modify_SETotal" class="agile_buton">Modify</button> \
+<button id="agile_cancel_SETotal" class="agile_buton">Cancel</button> \
 <br><br><p class="agile_mtseMessage agile_lightMessage"></p> \
 <br>\
-<span class="agile_lightMessage">Use "Modify" or use the "S/E bar" ?<br>Modify a 1ˢᵗ estimate ? See </span> <button class="agile_modify_help" style="display:inline-block;"  href="">help</button> \
+<span class="agile_lightMessage">Use "Modify" or use the "S/E bar" ?<br>Modify a 1ˢᵗ estimate ? See </span> <button class="agile_modify_help agile_buton" style="display:inline-block;"  href="">help</button> \
 </dialog>');
         getDialogParent().append(divDialog);
         divDialog = $(".agile_dialog_editSETotal");
@@ -1747,8 +1749,8 @@ function addCardCommentHelp() {
 				const div = $("<div class='no-print'></div>");
 				div.append(createRecurringCheck());
 				createHashtagsList(div);
+				div.append('<span style="margin-left:1px">&nbsp;&nbsp;</span>');
 				createSEMenu(div);
-
 				windowHeaderElement.append(div[0]);
 			}
 		}
@@ -2811,7 +2813,7 @@ function showSEHelpDialog(section) {
 <dialog class="agile_dialog_SEHelp agile_dialog_DefaultStyle"> \
 <img style="float:right;cursor:pointer;" id="agile_dialog_SEHelp_OK" src="' + chrome.extension.getURL("images/close.png") + '"></img>\
 <h2 id="agile_dialog_SEHelp_Top" style="outline: none;" align="center">Spent / Estimates help</h2>\
-<select tabindex="1" id="agile_sehelp_combotopic">\
+<select tabindex="1" id="agile_sehelp_combotopic" class="agile_combo_input">\
     <option value="welcome">Click here to pick a help topic</option>\
     <option value="addest">Add user estimate or global estimate</option>\
     <option value="addspent">Add user spent</option>\

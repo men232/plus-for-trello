@@ -25,25 +25,28 @@ function showTransferEDialogWorker(userLast) {
 <select class="agile_transferE_keywords agile_combo_smaller" title="Pick the keyword for this modification."></select> \
 <a class="agile_transferE_kwReportLink agile_linkSoftColor" href="" target="_blank">view keyword report</a> \
 <table class="agile_seTotalTable"> \
+<tbody class="agile-card-background"> \
 <tr> \
 <td align="left" class="agile-etransfer-tcel-header">From</td> \
 <td align="left" class="agile-etransfer-tcel-header">To</td> \
 <td align="left" class="agile-etransfer-tcel-header" style="white-space: nowrap;">E ' + UNITS.getLongFormat(UNITS.current,g_bDisplayPointUnits) + '</td> \
 </tr> \
 <tr> \
-<td align="left"><select class="agile_transferE_user_from agile_combo_regular" title="Pick the \'from\' user."></select></td> \
-<td align="left"><select autofocus class="agile_transferE_user_to agile_combo_regular" title="Pick the \'to\' user."></select></td> \
-<td align="left"><input class="agile_transferE_e" maxlength="10"</input></td> \
+<td align="left"><select class="agile_transferE_user_from agile_combo_regular agile_combo_input agile_focusColorBorder" title="Pick the \'from\' user."></select></td> \
+<td align="left"><select autofocus class="agile_transferE_user_to agile_combo_regular agile_combo_input agile_focusColorBorder" title="Pick the \'to\' user."></select></td> \
+<td align="left"><input class="agile_transferE_e agile_text_input" maxlength="10"</input></td> \
 </tr> \
+</tbody> \
 </table> \
-<input class="agile_se_note agile_placeholder_small" placeholder="type an optional note"  maxlength="250"></input> \
+<input class="agile_se_note agile_placeholder_small agile_text_input" placeholder="type an optional note"  maxlength="250"></input> \
 <label class="agile_unselectable" style="vertical-align: middle;font-weight:normal;line-height:1em;"><input type="checkbox" class="agile_transfere_alsospend" style="vertical-align: middle;margin-bottom:4px;margin-top:4px;" /> Immediately spend the transferred ' + UNITS.getLongFormat(UNITS.current, g_bDisplayPointUnits) + '.</label>\
-<button id="agile_enter_transferE">Enter</button> \
-<button id="agile_cancel_transferE">Cancel</button> \
-<button id="agile_help_transferE" style="display:inline-block;float:right;">Help</button> \
+<button id="agile_enter_transferE" class="agile_buton">Enter</button> \
+<button id="agile_cancel_transferE" class="agile_buton">Cancel</button> \
+<button id="agile_help_transferE" class="agile_buton" style="display:inline-block;float:right;">Help</button> \
 <p class="agile_transferEMessage agile_lightMessage">&nbsp;</p> \
 <br> \
 <table style="agile-etransfer-stats">\
+<tbody class="agile-card-background"> \
 <tr class="agile-card-background-header">\
 <td style="width:50%;">User balances after Enter</td>\
 <td style="width:15%;">S <span style="font-size:0.85em">sum</span></td>\
@@ -61,6 +64,7 @@ function showTransferEDialogWorker(userLast) {
 <td class="agile-etransfer-cell agile-etransfer-tcel-to-s"></td>\
 <td class="agile-etransfer-cell agile-etransfer-tcel-to-e"></td>\
 <td class="agile-etransfer-cell agile-etransfer-tcel-to-r"></td>\
+</tbody>\
 </table>\
 </dialog>');
         getDialogParent().append(divDialog);

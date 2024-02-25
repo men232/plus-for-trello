@@ -1305,7 +1305,7 @@ function fillRecentWeeksList(combo) {
         var textPretty = text;
         if (year==yearCur)
             textPretty = "W" + parts[1];
-        combo.append($(new Option(textPretty, text)).addClass('agile_weeks_combo_element').attr("title", title));
+        combo.append($(new Option(textPretty, text)).addClass('agile_title_combo_element').attr("title", title));
         daysDelta = 13; //7+6
     }
 
@@ -1324,7 +1324,7 @@ function adjustSelectWidthToContent(combo) {
 }
 
 function getRecentWeeksList() {
-    var combo = $('<select id="spentRecentWeeks" />').addClass("agile_weeks_combo agile_boldfont");
+    var combo = $('<select id="spentRecentWeeks" />').addClass("agile_title_combo agile_combo_input agile_boldfont agile_title_combo_input");
 	combo.css('cursor', 'pointer');
 	combo.attr("title", "click to change the week being viewed.");
 	if (g_bNoSE)
@@ -1360,7 +1360,7 @@ function getKeywordsViewList() {
         combo = g_bheader.comboSEView;
 
     if (combo.length == 0) {
-        combo = $('<select id="agile_globalkeywordlist"/>').addClass("agile_weeks_combo"); //review: rename agile_weeks_combo to generic
+        combo = $('<select id="agile_globalkeywordlist"/>').addClass("agile_title_combo agile_combo_input agile_title_combo_input");
         combo.css('cursor', 'pointer');
         combo.attr("title", "Plus - Click to change the S/E view");
     }
@@ -1386,7 +1386,7 @@ function getKeywordsViewList() {
         if (bMultipleKeywords)
             rgItems.push({ str: "↗ Report by keyword", val: VAL_COMBOVIEWKW_REPORTKW });
         rgItems.push({ str:  "↗ Dimensions help", val: VAL_COMBOVIEWKW_HELP });
-        fillComboKeywords(combo, rgItems, g_dimension, "agile_weeks_combo_element", '\u00A0\u00A0\u00A0', true);
+        fillComboKeywords(combo, rgItems, g_dimension, "agile_title_combo_element", '\u00A0\u00A0\u00A0', true);
         if (combo.val() != g_dimension) { //keyword no longer in use, default to all
             combo.val(VAL_COMBOVIEWKW_ALL);
             doComboChange();
@@ -1793,9 +1793,9 @@ function insertFrontpageChartsWorker(mainDiv, dataWeek, user) {
 		row2.append(cellD);
 		waiter.SetWaiting(true);
 		var divItemDashboardRecent = addModuleSection(true, false, cellA, "", idRecentModule, true, "left", false);
-		divItemDashboardRecent.addClass("agile_spent_item_title  agile_spent_item_combo").attr("title", "Your recent S/E.\n\nTip: control+click items to open in a new tab");
+		divItemDashboardRecent.addClass("agile_spent_item_title  agile_spent_item_combo agile_combo_input").attr("title", "Your recent S/E.\n\nTip: control+click items to open in a new tab");
 		var divItemDashboardUnspent = addModuleSection(true, false, cellA, "", idPendingModule, true, "left", false);
-		divItemDashboardUnspent.addClass("agile_spent_item_combo").attr("title", "Your remaining S/E.\n\nTip: control+click items to open in a new tab");
+		divItemDashboardUnspent.addClass("agile_spent_item_combo agile_combo_input").attr("title", "Your remaining S/E.\n\nTip: control+click items to open in a new tab");
 		if (bNewTrelloHome) {
 		    divItemDashboardRecent.addClass("newTrelloHomeBackground");
 		    divItemDashboardUnspent.addClass("newTrelloHomeBackground");

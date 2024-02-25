@@ -392,7 +392,7 @@ var Help = {
 <a class="agile_link_noUnderlineNever" href="https://www.linkedin.com/in/zigmandel" rel="publisher" target="_blank"> \
 <img src="https://www.linkedin.com/favicon.ico" title="Connect at LinkedIn" style="margin-bottom:-3px;margin-right:1px;border:0;width:16px;height:16px;"/></A></span>');
 	    }
-	    helpWin.para("version " + g_manifestVersion + "&nbsp;&nbsp<button style='float:right'>Close</button>").children("button").click(onClosePane);
+	    helpWin.para("version " + g_manifestVersion + "&nbsp;&nbsp<button style='float:right' class='agile_buton'>Close</button>").children("button").click(onClosePane);
 	    helpWin.para('Fixed by <a href="https://github.com/men232" target="_blank">Andrew L.</a>');
 
 	    helpWin.para("&nbsp;");
@@ -402,7 +402,7 @@ var Help = {
 	    }
 
 	    helpWin.para('<b><h3>Language</h3></b>');
-	    var pComboLang = helpWin.para('<select style="width:auto"></select>');
+	    var pComboLang = helpWin.para('<select style="width:auto" class="agile_combo_input"></select>');
 	    var comboLang = pComboLang.children('select');
 	    comboLang.append($(new Option("English", "en")));
 	    comboLang.append($(new Option("Chinese - 中文", "zh-CN")));
@@ -468,7 +468,7 @@ Plus is compatible with <A target="_blank" href="https://chrome.google.com/webst
 	    }
 	    
 	    if (getIdBoardFromUrl(document.URL) != "0jHOl1As") {
-	        helpWin.para("<div style='display:inline-block;border: 1px solid;border-radius:3px;border-color:RGB(77,77,77);padding:1em;background-color: #E4F0F6;'>Visit the <span style='font-weight:bold;font-size:110%;'><A target='_blank' href=''>Plus Help board</A></span> for the best place to learn about Plus.</div>").find("A").click(function (e) {
+	        helpWin.para("<div style='display:inline-block;border: 1px solid;border-radius:3px;border-color:var(--ds-border);padding:1em;background-color: var(--ds-background-inverse-subtle);'>Visit the <span style='font-weight:bold;font-size:110%;'><A target='_blank' href=''>Plus Help board</A></span> for the best place to learn about Plus.</div>").find("A").click(function (e) {
 	            window.open("https://trello.com/b/0jHOl1As/plus-for-trello-help", "_blank");
 	            e.preventDefault();
 	        });
@@ -608,7 +608,7 @@ Enable "➤ sync" below to see Reports, full Chrome Plus menu, team S/E and use 
 
 	    function addProSection() {
 	        helpWin.para('<h2 id="agile_pro_section">Plus Pro version</h2>');
-	        var paraPro = helpWin.para('<input style="vertical-align:middle;margin-bottom:0px;" type="checkbox" class="agile_checkHelp" value="checkedProVersion" id="agile_plus_checkPro" /><label style="display:inline-block;color:black !important;" for="agile_plus_checkPro">Enable "Pro" features</label>');
+	        var paraPro = helpWin.para('<input style="vertical-align:middle;margin-bottom:0px;" type="checkbox" class="agile_checkHelp" value="checkedProVersion" id="agile_plus_checkPro" /><label style="display:inline-block;color:var(--ds-text-brand) !important;" for="agile_plus_checkPro">Enable "Pro" features</label>');
 	        var checkEnablePro = paraPro.children('input:checkbox:first');
 	        var textEnablePro = '<div id="sectionWhyPro">If you love Plus, enable Pro!';
 
@@ -913,7 +913,7 @@ Enable "➤ sync" below to see Reports, full Chrome Plus menu, team S/E and use 
 	        window.open("https://trello.com/b/0jHOl1As/plus-for-trello-help", "_blank");
 	        e.preventDefault();
 	    });
-	    comboSync = helpWin.para('<select id="agile_idComboSync" style="width:auto;height:2em;">').children('select');
+	    comboSync = helpWin.para('<select id="agile_idComboSync" style="width:auto;height:2em;" class="agile_combo_input">').children('select');
 	    comboSync.append($(new Option("Sync off", SYNCMETHOD.disabled)).addClass("agile_box_input_hilite_red"));
 	    comboSync.append($(new Option("Recommended - Store inside Trello (S/E in Trello card comments)", SYNCMETHOD.trelloComments)).addClass("agile_normalBackground"));
 	    comboSync.append($(new Option("Stealth - Store outside Trello (S/E in Google spreadsheet)", SYNCMETHOD.googleSheetStealth)).addClass("agile_normalBackground"));
@@ -1300,7 +1300,7 @@ Enable "➤ sync" below to see Reports, full Chrome Plus menu, team S/E and use 
 	    helpWin.para('&nbsp');
 	    if (true) { //units
 	        var pComboUnits = helpWin.rawSE('<p><span>&bull; Work units: </span></p>');
-	        var comboUnits = $('<select style="width:auto">');
+	        var comboUnits = $('<select style="width:auto" class="agile_combo_input">');
 	        pComboUnits.append(comboUnits).append($('<span> Card timers measure time in your units. When changing units, S/E already entered is assumed in the new units so set your units here before entering any S/E.</span>'));
 	        comboUnits.append($(new Option(UNITS.getLongFormat(UNITS.minutes), UNITS.minutes)));
 	        comboUnits.append($(new Option(UNITS.getLongFormat(UNITS.hours), UNITS.hours)));
@@ -1391,7 +1391,7 @@ Enable "➤ sync" below to see Reports, full Chrome Plus menu, team S/E and use 
         //Week starts on
 	    if (true) {
 	        var pComboDow = helpWin.raw('<p><span>Week starts on </span></p>').addClass('agile_help_indent1');
-	        comboDowStart = $('<select style="width:auto">');
+	        comboDowStart = $('<select style="width:auto" class="agile_combo_input">');
 	        comboDowStart.appendTo(pComboDow);
 	        //comboDowStart.append($(new Option("saturday", "6"))); //dom: saturday not ready. many edge cases not handled.
 	        comboDowStart.append($(new Option("sunday", "0")));
@@ -1443,7 +1443,7 @@ Enable "➤ sync" below to see Reports, full Chrome Plus menu, team S/E and use 
 	    //enable support for custom weeks
 	    if (true) {
 	        var pComboWeekDelta = helpWin.raw('<p><span>Use any start day by shifting the week -back or +forward: </span></p>').addClass('agile_help_indent1');
-	        comboWeekDeltaStart = $('<select style="width:auto">');
+	        comboWeekDeltaStart = $('<select style="width:auto" class="agile_combo_input">');
 	        comboWeekDeltaStart.appendTo(pComboWeekDelta);
 	        pComboWeekDelta.append("<span> </span>");
 	        pComboWeekDelta.append($('<a href="">Tell me more</a>')).children('a').click(function (ev) {
@@ -1734,7 +1734,7 @@ Do not warn when starting a timer when another timer is active.</input>').childr
 	    }
 
 	    if (true) { //always show Spent in the Chrome icon, even when a timer is active.
-	        var comboSpentOnAppIcon = helpWin.paraSE('Show your weekly spent on the Chrome Plus icon? <select style="width:auto"></select>').children('select:first');
+	        var comboSpentOnAppIcon = helpWin.paraSE('Show your weekly spent on the Chrome Plus icon? <select style="width:auto" class="agile_combo_input"></select>').children('select:first');
 	        comboSpentOnAppIcon.append($(new Option("Yes except when there is an active timer", OPT_SHOWSPENTINICON_NORMAL)));
 	        comboSpentOnAppIcon.append($(new Option("Yes always (even with an active timer)", OPT_SHOWSPENTINICON_ALWAYS)));
 	        comboSpentOnAppIcon.append($(new Option("No, never show it.", OPT_SHOWSPENTINICON_NEVER)));
@@ -1774,7 +1774,7 @@ Do not show daily spent total popup notifications every time you enter spent.</i
 
         //Options to show mini-me card popups
 	    if (true) { 
-	        var comboCardPopupStyle = helpWin.para('Use <A href="https://trello.com/c/ZduasRWD/138-mini-me-card-popups" target="_blank">mini-me card popups</A> in reports and Chrome menu? <select style="width:auto"></select>').children('select:first');
+	        var comboCardPopupStyle = helpWin.para('Use <A href="https://trello.com/c/ZduasRWD/138-mini-me-card-popups" target="_blank">mini-me card popups</A> in reports and Chrome menu? <select style="width:auto" class="agile_combo_input"></select>').children('select:first');
 	        comboCardPopupStyle.append($(new Option("Yes, as small card popups (limited funcionality)", CARDPOPUPTYPE.POPUP_NOACTIONS)));
 	        comboCardPopupStyle.append($(new Option("Yes, as medium card popups (more functionality)", CARDPOPUPTYPE.POPUP_SOMEACTIONS)));
 	        comboCardPopupStyle.append($(new Option("No, open Trello cards in a Chrome tab", CARDPOPUPTYPE.NO_POPUP)));

@@ -1131,15 +1131,22 @@ function handleExtensionMessage(request, sendResponseParam, idTabSender, idWindo
 
     doit();
 
-    function handleQueryTrelloToken(sendResponse) {
-        var myUrl = "https://trello.com/ ";
+    function handleQueryTrelloToken(sendResponse, attempt = 1) {
+        var myUrl = "https://trello.com/";
+        var maxAttempts = 5;
+
         chrome.cookies.get({ url: myUrl, name: "token" }, function (cookie) {
             if (cookie != undefined) {
                 sendResponse({ cookie_value: cookie.value });
             }
             else {
-                console.log("handleQueryTrelloToken() - not able to read the token cookies!");
-                sendResponse({ cookie_value: 0 });
+                if (attempt <= maxAttempts) {
+                    console.log(`handleQueryTrelloToken() - attempt = ${attempt + 1})`);
+                    setTimeout(() => handleQueryTrelloToken(sendResponse, attempt + 1), 1000 * attempt);
+                } else {
+                    console.log("handleQueryTrelloToken() - not able to read the token cookies!");
+                    sendResponse({ cookie_value: 0 });
+                }
             }
         });
     }

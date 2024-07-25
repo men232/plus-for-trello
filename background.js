@@ -1133,7 +1133,7 @@ function handleExtensionMessage(request, sendResponseParam, idTabSender, idWindo
 
     function handleQueryTrelloToken(sendResponse, attempt = 1) {
         chrome.cookies.getAll({ domain: 'trello.com' }, (cookies) => {
-            const token = cookies.find(v => v.name);
+            const token = cookies.find(v => v.name === 'token');
 
             if (token) {
                 console.log('handleQueryTrelloToken() - token captured 🥳');

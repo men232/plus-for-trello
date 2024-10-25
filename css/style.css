@@ -121,9 +121,6 @@ list-style-type:disc !important;
 }
 
 #agile_globalkeywordlist {
-   float:right !important;
-   margin-right:11px !important;
-   margin-top:8px !important;
    width:8em !important;
 }
 
@@ -329,7 +326,6 @@ div.agile_box {
 }
 
 div.agile_estimation_box {
-    margin-right: 5px;
 }
 
 .agile_estimation_box:hover {
@@ -352,10 +348,20 @@ div.agile_spent_box {
     color: black !important;
 }
 
+#added_agile_menu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#added_agile_menu > .agile_box {
+    white-space: nowrap;
+}
+
 div.agileBox_right {
-    float: right !important;
-    margin-top: 5px !important;
-    margin-right: 10px !important;
+    /* float: right !important; */
+    /* margin-top: 5px !important; */
+    /* margin-right: 10px !important; */
 }
 
 div.agileBox_home {
@@ -366,11 +372,15 @@ div.agileBox_home {
     cursor:pointer !important;
 }
 
+#agile_help_buttons_container {
+    display: flex;
+    align-items: center;
+}
+
 div.agile_total_box {
-	margin-right: 5px;
     cursor:default;
     border-radius:4px;
-    border: solid 1px var(--ds-border-inverse);
+    border: solid 1px var(--ds-border-input);
     color: var(--dynamic-text);
     background-color: transparent;
     min-width:1em !important;
@@ -537,9 +547,6 @@ a.agile_close_button {
 }
 
 .agile_plus_burndown_link {
-	float: right;
-	margin-right: 10px;
-	margin-top: 5px;
 }
 
 /*
@@ -1307,9 +1314,6 @@ table#tableMarkers td {
 }
 
 .agile_img_boardheader {
-    float:right;
-    margin-right:14px;
-    margin-top:8px;
     opacity: 0.6;
     cursor: pointer;
 }
@@ -1546,21 +1550,18 @@ table#tableMarkers td {
 .agile_title_combo {
     direction: rtl !important;
 	text-decoration: none !important;
-	padding: 0px !important;
 	color: var(--dynamic-text) !important;
 	vertical-align: top !important;
 	font-size: 12px !important;
 	margin-bottom: 0px !important;
 	margin-right: 0px !important;
-    padding-right: 0px !important;
 	background: rgba(255,255,255,0) !important;
-    margin-top:5px !important;
     width:auto;
-	height: 20px;
+	height: 24px;
 	display: inline;
 	-webkit-appearance: none;
     border-radius: 3px !important;
-    border: solid 1px var(--ds-border-inverse);
+    border: solid 1px var(--ds-border-input);
 }
 
 .agile_title_combo_input:hover {

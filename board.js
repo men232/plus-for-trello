@@ -760,8 +760,8 @@ var List = {
 
 var InfoBoxManager = {
     update: function () {
-        // ----------- FIX-TRELLO boardHeader 2023-05-21 ------------ //
-        var boardHeader = $('.board-header > div > div >span:nth-of-type(2)');
+        // ----------- FIX-TRELLO boardHeader 2024-10-25 ------------ //
+        var boardHeader = $('[data-testid="authenticated-header"] > div:nth-of-type(2)');
         var $agileMenu = $("#added_agile_menu");
         if ($agileMenu.length>0){
             boardHeader = $agileMenu;
@@ -770,7 +770,7 @@ var InfoBoxManager = {
             boardHeader.prepend(box);
             boardHeader = box;
         }
-        // ----------- FIX-TRELLO boardHeader 2023-05-21  ------------ //
+        // ----------- FIX-TRELLO boardHeader 2024-10-25  ------------ //
 
         if (boardHeader.length != 1)
             return;
@@ -812,7 +812,7 @@ var InfoBoxFactory = {
         if (type == ESTIMATION) {
             return box.addClass('agile_estimation_box').html('0');
         } else if (type == SPENT) {
-            return box.addClass('agile_spent_box').html('0');
+            return box.html('0');
         } else if (type == REMAINING) {
             return box.addClass('agile_remaining_box').html('0');
         }
@@ -826,7 +826,7 @@ var InfoBoxFactory = {
         if (type == ESTIMATION) {
             return box.addClass('agile_estimation_box').html(bBoardTotals?'E: 0': '0');
         } else if (type == SPENT) {
-            return box.addClass('agile_spent_box').html(bBoardTotals?'S: 0': '0');
+            return box.html(bBoardTotals?'S: 0': '0');
         } else if (type == REMAINING) {
             return box.addClass('agile_remaining_box').html(bBoardTotals ? 'R: 0' : '0');
         }

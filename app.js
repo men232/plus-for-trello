@@ -75,11 +75,11 @@ function insertCardTimer(containerBar) {
         if (!idCardCur)
             return true;
 
-        var sidebars = $(".window-sidebar");
+        var sidebars = $('[data-testid="card-back-name"]');
         if (sidebars.length == 0)
             return false;
 
-        var actions = sidebars.find($(".js-move-card")).first();
+        var actions = sidebars.find($('[data-testid="card-back-copy-card-button"]')).first().parent();
         if (actions.length == 0)
             return false;
         var divInsert = actions.parent();

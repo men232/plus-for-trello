@@ -25,6 +25,23 @@ chrome.runtime.onInstalled.addListener(function (details) {
     }
 });
 
+chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      {
+        id: 1,
+        priority: 1,
+        action: {
+          type: "modifyHeaders",
+          requestHeaders: [{ header: "Referer", operation: "set", value: "https://trello.com/search" }],
+        },
+        condition: {
+          urlFilter: "https://trello.com/1/search",
+          resourceTypes: ["xmlhttprequest"],
+        },
+      },
+    ],
+  });
+
 function handleUpdateExtension(details) {
     var versionNew = (details || { version: "" }).version || "";
     if (!versionNew)

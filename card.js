@@ -406,8 +406,7 @@ function showSEButtonBubble(elem) {
     showBubbleFromStep(step, true, true, 0);
 }
 
-function createSEButton() {
-    var parent = $(".js-new-comment-react-root .js-react-root");
+function createSEButton(parent) {
     if (parent.length == 1) {
         var a = $("<A class='comment-box-options-item agile-addSEButton' href='#' title='Add Plus S/E'>");
         var spanIcon = $("<span class='icon-sm'/>");
@@ -416,7 +415,7 @@ function createSEButton() {
         //icon.addClass("agile-spent-icon-cardcommentSE");
         spanIcon.append(icon);
         a.append(spanIcon);
-        parent.prepend(a);
+        parent.before(a);
         a.click(function () {
             showSEBarContainer(false,true,false, true);
         });
@@ -532,10 +531,21 @@ function alertNoIncE() {
     alert("You cannot increase the estimate (hey, just following your Preferences.)\nYour manager can increase estimates for you.\n\nTip: Are you typing in the correct Spent / Estimate box?");
 }
 
+/**
+ * @param {HTMLElement} parentSEInput 
+ * @param {*} idCardCur 
+ * @param {*} board 
+ */
 function createCardSEInput(parentSEInput, idCardCur, board) {
     assert(idCardCur);
 	var bHasSpentBackend = isBackendMode();
 	g_seCardCur = null; //remains null for a short time, until card report is loaded. code must check for ===null
+
+    const prevMenu = parentSEInput.parentElement?.querySelector('.' + g_inputSEClass);
+
+    if (prevMenu) {
+        prevMenu.remove();
+    }
 
 	var container = $("<div class='notranslate'></div>").addClass(g_inputSEClass).hide();
 	var containerStats = $("<div></div>");
@@ -704,6 +714,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	            keyword = comboKeyword.val() || "";
 	        var s = parseSEInput(spinS, false, false, true);
 	        var e = parseSEInput(spinE, false, false, true);
+
 	        if (s == null) {
 	            hiliteOnce(spinS, 500);
 	            return;
@@ -738,6 +749,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 
 	        if (!verifyValidInput(sTotal, eTotal))
 	            return;
+
 	        var prefix = comboDays.val() || "";
 	        if (!prefix || prefix == g_strDateOtherOption) {
 	            hiliteOnce(comboDays, 500);
@@ -809,7 +821,7 @@ function createCardSEInput(parentSEInput, idCardCur, board) {
 	fillCardSEStats(tableStats, function () {
 	    container.show();
         if (!g_bNoSE)
-	        createSEButton();
+	        createSEButton(parentSEInput);
 	    insertCardTimer();
 	    g_currentCardSEData.loadFromStorage(idCardCur, function () {
 	        if (g_currentCardSEData.idCard != idCardCur)
@@ -1720,6 +1732,7 @@ function addCardCommentHelp() {
 	if (!g_bReadGlobalConfig)
 		return; //wait til later
 
+
 	const isSEInputInitialized = !!document.querySelector('.' + g_inputSEClass);
 
 	//create S/E bar if not there yet
@@ -1735,18 +1748,27 @@ function addCardCommentHelp() {
         //simply so in case idBoard(Short) isnt cached, go get it from the api and cache it so its ready when the S/E is entered by the user
 		FindIdBoardFromBoardName(board, idCardCur, function (idBoardFound) { });
 
-		const windowElements = document.querySelectorAll('.card-detail-window');
+		const windowElements = document.querySelectorAll('[data-testid="card-back-name"]');
 
 		for (const windowEl of windowElements) {
-			const newCommentElement = windowEl.querySelector('.new-comment');
-			const windowHeaderElement = windowEl.querySelector('.window-header');
+			const newCommentElement = (
+                windowEl.querySelector('[data-testid="card-back-new-comment-input-skeleton"]') ||
+                windowEl.querySelector('[data-testid="card-back-comment-editor-container"]')
+            );
+			const windowHeaderElement = windowEl.querySelector('#card-back-name')?.parentElement;
 
 			if (newCommentElement) {
 				createCardSEInput($(newCommentElement), idCardCur, board);
 			}
 
 			if (windowHeaderElement) {
-				const div = $("<div class='no-print'></div>");
+				const div = $("<div class='no-print' data-testid='plus-se-menu'></div>");
+                const prevSE = windowHeaderElement.querySelector('[data-testid="plus-se-menu"]')
+
+                if (prevSE) {
+                    prevSE.remove();
+                }
+
 				div.append(createRecurringCheck());
 				createHashtagsList(div);
 				div.append('<span style="margin-left:1px">&nbsp;&nbsp;</span>');
@@ -2556,7 +2578,7 @@ function helperInsertHistoryRow(dateNow, idCard, idBoard, strBoard, strCard, rgU
 function doEnterSEIntoCard(s, e, commentBox, comment, idBoard, idCard, strDays, strBoard, keyword, member, memberTransferTo, onBeforeStartCommit, onFinished) {
     var titleCardNew = null;
 	var commentEnter = comment;
-    var elem = $(".card-detail-title-assist");
+    var elem = $("#card-back-name");
     if (elem.length == 0)
         return; //trello html broke.
     var titleCur = elem.text();

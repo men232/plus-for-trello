@@ -105,7 +105,7 @@ function escapeHtml(string) {
 
 function getDialogParent(bForceBody) {
     if (!bForceBody) {
-        var par = $(".card-detail-window");
+        var par = $('[data-testid="card-back-name"]');
         if (par.length > 0)
             return par;
     }

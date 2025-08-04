@@ -1,4 +1,5 @@
 import './background-glue.js';
+import './XMLHttpRequest.js';
 
 localStorage.refresh();
 

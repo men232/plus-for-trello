@@ -13,7 +13,7 @@ globalThis.g_dateMinTransferInPast = new Date(2017, 8, 15); //REVIEW cardtransfe
 //                                       users               days           spent                      command           /        estimate              spaces   note
 globalThis.g_regexSEFull = new RegExp("^((\\s*@\\w+\\s+)*)((-[0-9]+)[dD]\\s+)?(([+-]?[0-9]*[.:]?[0-9]*)|(\\^[a-zA-Z]+))?\\s*(/?)\\s*([+-]?[0-9]*[.:]?[0-9]*)?(\\s*)(\\s[\\s\\S]*)?$");
 
-function readTrelloCommentDataFromAction(action, rgKeywords, alldata, usersMap, idMemberMapByName) {
+globalThis.readTrelloCommentDataFromAction = function readTrelloCommentDataFromAction(action, rgKeywords, alldata, usersMap, idMemberMapByName) {
     var tableRet = [];
     var id = action.id;
     var from = null;
@@ -240,7 +240,7 @@ function readTrelloCommentDataFromAction(action, rgKeywords, alldata, usersMap, 
 }
 
 
-function matchCommentParts(text, date, bRecurringCard, userFrom) {
+globalThis.matchCommentParts = function matchCommentParts(text, date, bRecurringCard, userFrom) {
     //? is used to force non-greedy
     var i_users = 1;
     var i_days = 4;

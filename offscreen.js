@@ -22,21 +22,3 @@ console.log("works?");
 //     });
 //   });
 // }
-
-// chrome.declarativeNetRequest.updateDynamicRules({
-//   removeRuleIds: [1],
-//   addRules: [
-//     {
-//       id: 1,
-//       priority: 1,
-//       action: {
-//         type: "modifyHeaders",
-//         requestHeaders: [{ header: "Referer", operation: "set", value: "https://trello.com/search" }],
-//       },
-//       condition: {
-//         urlFilter: "https://trello.com/1/search",
-//         resourceTypes: ["xmlhttprequest"],
-//       },
-//     },
-//   ],
-// });

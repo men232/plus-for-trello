@@ -657,14 +657,12 @@ globalThis.sendExtensionMessage = function sendExtensionMessage(obj, responsePar
 
   try {
     //sending a message from bk to bk doesnt work, so do it manually
-    if (g_bFromBackground && chrome.runtime && chrome.runtime.getBackgroundPage) {
-      getBackgroundPage(function (bkPage) {
-        try {
-          bkPage.handleExtensionMessage(obj, preResponse);
-        } catch (e) {
-          logException(e);
-        }
-      });
+    if (g_bFromBackground && globalThis.handleExtensionMessage) {
+      try {
+        handleExtensionMessage(obj, preResponse);
+      } catch (e) {
+        logException(e);
+      }
       return;
     }
 
@@ -804,15 +802,7 @@ globalThis.getSQLReportShared = function getSQLReportShared(sql, values, okCallb
     resolveFn = resolve;
     rejectFn = reject;
     var obj = { method: "getReport", sql: sql, values: values };
-    if (chrome && chrome.runtime && chrome.runtime.getBackgroundPage) {
-      //calling directly background (vs using a message) should be more efficient and allow bigger returned tables
-      getBackgroundPage(function (bkPage) {
-        console.log(bkPage);
-        bkPage.handleGetReport(obj, sendResponse);
-      });
-    } else {
-      sendExtensionMessage(obj, sendResponse);
-    }
+    sendExtensionMessage(obj, sendResponse);
   }
 
   doit();
@@ -1521,9 +1511,9 @@ globalThis.getWeekNumCalc = function getWeekNumCalc(dateIn, dowOffset) {
   if (day < 4) {
     weeknum = Math.floor((daynum + day - 1) / 7) + 1;
     if (weeknum > 52) {
-      nYear = new Date(dateIn.getFullYear() + 1, 0, 1);
-      nday = nYear.getDay() - dowOffset;
-      nday = nday >= 0 ? nday : nday + 7;
+      var nYear = new Date(dateIn.getFullYear() + 1, 0, 1);
+      var nday = nYear.getDay() - dowOffset;
+      var nday = nday >= 0 ? nday : nday + 7;
       /*if the next year starts before the middle of
  			  the week, it is week #1 of that year*/
       weeknum = nday < 4 ? 1 : 53;
@@ -2419,18 +2409,3 @@ globalThis.hitAnalytics = function hitAnalytics(category, action, bSkipNewbie) {
     function (response) {}
   );
 };
-
-
-function getBackgroundPage(fn) {
-  chrome.runtime.getContexts({
-    contextTypes: ['BACKGROUND']
-  }, function(contexts) {
-    if (contexts.length > 0) {
-      const serviceWorker = contexts[0];
-      fn(serviceWorker)
-      return;
-    }
-
-    throw new Error('runtime.getContexts returns 0')
-  });
-}

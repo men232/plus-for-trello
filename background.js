@@ -1100,6 +1100,7 @@ globalThis.handleExtensionMessage = function handleExtensionMessage(
 
   function sendResponse(obj) {
     try {
+      console.log("MAKE_RES", obj, typeof sendResponseParam);
       if (sendResponseParam) sendResponseParam(obj);
     } catch (e) {
       logException(e);

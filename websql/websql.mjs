@@ -30,8 +30,6 @@ const setupSystemStorage = async (client) => {
  */
 
 globalThis.openDatabase = async (name) => {
-  console.info("Loading and initializing SQLite3 module...");
-
   const client = new SQLocal({
     databasePath: `${name}.sqlite3`,
   });

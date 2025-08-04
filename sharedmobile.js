@@ -272,7 +272,7 @@ globalThis.g_currentCardSEData = {
 };
 
 //prepends [by user] [xd] [^etransfer from/to user] to comments, returns new string 
-function appendCommentBracketInfo(deltaParsed, comment, from, rgUsersProcess, iRowPush, bETransfer) {
+globalThis.appendCommentBracketInfo = function appendCommentBracketInfo(deltaParsed, comment, from, rgUsersProcess, iRowPush, bETransfer) {
     var commentPush = comment;
     var userCur = rgUsersProcess[iRowPush] || from;
     var bSpecialETransferFrom = (bETransfer && iRowPush === 0);
@@ -296,7 +296,7 @@ function appendCommentBracketInfo(deltaParsed, comment, from, rgUsersProcess, iR
 }
 
 globalThis.g_regexDashCleanup = /-/g;
-function makeHistoryRowObject(dateNow, idCard, idBoard, strBoard, strCard, userCur, s, e, comment, idHistoryRowUse, keyword) {
+globalThis.makeHistoryRowObject = function makeHistoryRowObject(dateNow, idCard, idBoard, strBoard, strCard, userCur, s, e, comment, idHistoryRowUse, keyword) {
     //console.log(dateNow + " idCard:" + idCard + " idBoard:" + idBoard + " card:" + strCard + " board:" + strBoard);
     var obj = {};
     var userForId = replaceString(userCur, g_regexDashCleanup, '~'); //replace dashes from username. really should never happen since currently trello already strips dashes from trello username. see makeRowAtom

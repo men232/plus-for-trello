@@ -2,30 +2,30 @@
 //
 //DONT use const in this file, as mobile supports older browsers
 
-var SEP_IDHISTORY_MULTI = ".";
-var g_strUserMeOption = "me";
-var PREFIX_PLUSCOMMAND = "^"; //plus command starts with this (both card and board commands)
-var PLUSCOMMAND_RESET = "^resetsync";
-var PLUSCOMMAND_ETRANSFER = "^etransfer";
-var PLUSCOMMAND_ETRANSFER_FROMCARD = ".fromcard:";
-var g_prefixCommentTransfer = "[" + PLUSCOMMAND_ETRANSFER;
-var g_prefixCommentTransferTo = g_prefixCommentTransfer + " to ";
-var g_prefixCommentTransferFrom = g_prefixCommentTransfer + " from ";
-var g_dDaysMinimum = -10000; //sane limit of how many days back can be set on a S/E comment. limit is inclusive
-var TAG_RECURRING_CARD = "[R]";
-var DEFAULTGLOBAL_USER = "global";
-var g_strUserOtherOption = "other user...";
-var g_strDateOtherOption = "other date...";
-var g_valMaxDaysCombo = 5;
+globalThis.SEP_IDHISTORY_MULTI = ".";
+globalThis.g_strUserMeOption = "me";
+globalThis.PREFIX_PLUSCOMMAND = "^"; //plus command starts with this (both card and board commands)
+globalThis.PLUSCOMMAND_RESET = "^resetsync";
+globalThis.PLUSCOMMAND_ETRANSFER = "^etransfer";
+globalThis.PLUSCOMMAND_ETRANSFER_FROMCARD = ".fromcard:";
+globalThis.g_prefixCommentTransfer = "[" + PLUSCOMMAND_ETRANSFER;
+globalThis.g_prefixCommentTransferTo = g_prefixCommentTransfer + " to ";
+globalThis.g_prefixCommentTransferFrom = g_prefixCommentTransfer + " from ";
+globalThis.g_dDaysMinimum = -10000; //sane limit of how many days back can be set on a S/E comment. limit is inclusive
+globalThis.TAG_RECURRING_CARD = "[R]";
+globalThis.DEFAULTGLOBAL_USER = "global";
+globalThis.g_strUserOtherOption = "other user...";
+globalThis.g_strDateOtherOption = "other date...";
+globalThis.g_valMaxDaysCombo = 5;
 
-var MAP_UNITS = {
+globalThis.MAP_UNITS = {
     "m": 1000 * 60,
     "h": 1000 * 60 * 60,
     "d": 1000 * 60 * 60 * 24
 };
 
 
-var UNITS = {
+globalThis.UNITS = {
     minutes: "m",
     hours: "h",
     days: "d",
@@ -111,10 +111,10 @@ var UNITS = {
     }
 };
 
-var g_bChromeStorage = (typeof (chrome) != "undefined" && chrome.storage && chrome.storage.local);
+globalThis.g_bChromeStorage = (typeof (chrome) != "undefined" && chrome.storage && chrome.storage.local);
 
 //use chrome.storage.local if available, else use localStorage
-var g_storage = {
+globalThis.g_storage = {
     get: function (key, callback) { //callback(string or null)
         if (g_bChromeStorage) {
             chrome.storage.local.get(key, function (obj) {
@@ -159,7 +159,7 @@ var g_storage = {
 
 //information about what is being edited in the s/e card. can load/restore from storage per card
 //NOTE: g_currentCardSEData.user can be "me", must be manually mapped to g_user.username 
-var g_currentCardSEData = {
+globalThis.g_currentCardSEData = {
     loadFromStorage: function (idCard, callback) {
         assert(idCard);
         var key = this.keyStoragePrefix + idCard;
@@ -295,7 +295,7 @@ function appendCommentBracketInfo(deltaParsed, comment, from, rgUsersProcess, iR
     return commentPush;
 }
 
-var g_regexDashCleanup = /-/g;
+globalThis.g_regexDashCleanup = /-/g;
 function makeHistoryRowObject(dateNow, idCard, idBoard, strBoard, strCard, userCur, s, e, comment, idHistoryRowUse, keyword) {
     //console.log(dateNow + " idCard:" + idCard + " idBoard:" + idBoard + " card:" + strCard + " board:" + strBoard);
     var obj = {};

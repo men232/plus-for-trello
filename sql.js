@@ -1,33 +1,33 @@
 ﻿/// <reference path="intellisense.js" />
 
-var g_db = null;
-var STR_UNKNOWN_LABEL = "";
-var STR_UNKNOWN_TEAM = "Unknown team";
-var STR_UNKNOWN_LIST = "Unknown list";
-var STR_UNKNOWN_BOARD = "Unknown board";
-var STR_UNKNOWN_CARD = "Unknown card";
+globalThis.g_db = null;
+globalThis.STR_UNKNOWN_LABEL = "";
+globalThis.STR_UNKNOWN_TEAM = "Unknown team";
+globalThis.STR_UNKNOWN_LIST = "Unknown list";
+globalThis.STR_UNKNOWN_BOARD = "Unknown board";
+globalThis.STR_UNKNOWN_CARD = "Unknown card";
 
-var g_msRequestedSyncPause = 0; //sync can be paused for a few seconds with the "beginPauseSync" message. this way we avoid a pause/unpause pair that may break when user closes the tab.
-var LS_KEY_detectedErrorLegacyUpgrade = "plus_detected_error_legacy_upgrade";
+globalThis.g_msRequestedSyncPause = 0; //sync can be paused for a few seconds with the "beginPauseSync" message. this way we avoid a pause/unpause pair that may break when user closes the tab.
+globalThis.LS_KEY_detectedErrorLegacyUpgrade = "plus_detected_error_legacy_upgrade";
 
 //ver 3: 3.4.4
 //ver 4: 3.6.x (add labels)
 //ver 5: 3.6.6, fix bug where due dates were not being sync sometimes (due to introduction of search with incomplete card fields)
 //ver 6: 5.1.2, add card dueComplete
-var VERDEEPSYNC = {
+globalThis.VERDEEPSYNC = {
     CURRENT: 6,  //making it bigger will trigger a "deep sync" on all boards. must be > MINVALID
     MINVALID: 0,
     NOTMEMBER: -1 //hackinsh way to keep a special board state when user is no longer a member of the board. needed to distinguish from zero in first-sync case with existing db data
 };
 
-function isDbOpened() {
+globalThis.isDbOpened = function isDbOpened() {
     if (typeof (g_db) == "undefined") //in case its called from a global object during construction
         return false;
 
     return (!g_bOpeningDb && g_db);
 }
 
-function testResetVersion() {
+globalThis.testResetVersion = function testResetVersion() {
     if (!isDbOpened())
         return;
     alert("changing sql db version.");
@@ -36,7 +36,7 @@ function testResetVersion() {
     db.changeVersion(versionCur, 31);
 }
 
-function notifyTruncatedSyncState(msgErr) {
+globalThis.notifyTruncatedSyncState = function notifyTruncatedSyncState(msgErr) {
     //this is needed for emergency unlock of background globals.
     //without this, a coding error/assert/unhandled exception could lock up sync and thus prevent a reset
     logPlusError(msgErr);
@@ -48,7 +48,7 @@ function notifyTruncatedSyncState(msgErr) {
 }
 
 //based on http://blog.maxaller.name/2010/03/html5-web-sql-database-intro-to-versioning-and-migrations/
-function Migrator(db, sendResponse) {
+globalThis.Migrator = function Migrator(db, sendResponse) {
 	var migrations = [];
 	this.migration = function (number, func) {
 		migrations[number] = func;
@@ -85,7 +85,7 @@ function Migrator(db, sendResponse) {
 	};
 }
 
-function handleInsertHistoryRowFromUI(request, sendResponseParam) {
+globalThis.handleInsertHistoryRowFromUI = function handleInsertHistoryRowFromUI(request, sendResponseParam) {
     function sendResponse(response) {
         if (response.status==STATUS_OK)
             animateFlip();
@@ -102,19 +102,19 @@ function handleInsertHistoryRowFromUI(request, sendResponseParam) {
     false); //dont allow calling while db is open (will wait and retry)
 }
 
-var g_cFullSyncLock = 0;
-var g_cReadSyncLock = 0;
-var g_cWriteSyncLock = 0;
-var g_cRowsRead = 0;
+globalThis.g_cFullSyncLock = 0;
+globalThis.g_cReadSyncLock = 0;
+globalThis.g_cWriteSyncLock = 0;
+globalThis.g_cRowsRead = 0;
 
-function handleIsSyncing(sendResponse) {
+globalThis.handleIsSyncing = function handleIsSyncing(sendResponse) {
     loadBackgroundOptions(function () {
         var response = { status: STATUS_OK, bSyncing: (g_cReadSyncLock > 0 || g_cWriteSyncLock > 0 || g_syncStatus.bSyncing) };
         sendResponse(response);
     });
 }
 
-function handleUnpause(sendResponse) {
+globalThis.handleUnpause = function handleUnpause(sendResponse) {
     if (g_msRequestedSyncPause != 0) {
         g_cFullSyncLock -= 1;
         g_msRequestedSyncPause = 0;
@@ -124,7 +124,7 @@ function handleUnpause(sendResponse) {
         sendResponse({ status: STATUS_OK });
 }
 
-function handlePause(sendResponse) {
+globalThis.handlePause = function handlePause(sendResponse) {
     if (g_msRequestedSyncPause == 0) {
         g_cFullSyncLock += 1;
         updatePlusIcon(true);
@@ -134,7 +134,7 @@ function handlePause(sendResponse) {
 }
 
 
-function handleGetTotalRows(bOnlyNotSync, sendResponse, bAllowWhileOpening) {
+globalThis.handleGetTotalRows = function handleGetTotalRows(bOnlyNotSync, sendResponse, bAllowWhileOpening) {
 	var sql = null;
 	if (bOnlyNotSync)
 		sql = "select count(*) as total FROM HISTORY WHERE bSynced=0";
@@ -164,7 +164,7 @@ function handleGetTotalRows(bOnlyNotSync, sendResponse, bAllowWhileOpening) {
         bAllowWhileOpening);
 }
 
-function detectLegacyHistoryRows(sendResponse) {
+globalThis.detectLegacyHistoryRows = function detectLegacyHistoryRows(sendResponse) {
     var sDate = Math.round(g_dateMinCommentSELegacy.getTime() / 1000); //needed because a reset sync could have populated the keyword on the old rows
     var sql = sql = "select idHistory from history where date < ? OR keyword is NULL limit 1";
     var request = { sql: sql, values: [sDate] };
@@ -176,7 +176,7 @@ function detectLegacyHistoryRows(sendResponse) {
         true);
 }
 
-function handleGetTotalMessages(sendResponse) {
+globalThis.handleGetTotalMessages = function handleGetTotalMessages(sendResponse) {
 	var request = { sql: "select count(*) as total FROM LOGMESSAGES", values: [] }; //review zig: use max(rowid), handle empty case
 	handleGetReport(request,
 		function (response) {
@@ -194,15 +194,15 @@ function handleGetTotalMessages(sendResponse) {
 
 
 //review zig: restructure calling sync so this event can notify all
-function notifyStartSync() {
+globalThis.notifyStartSync = function notifyStartSync() {
     broadcastMessage({ event: EVENTS.START_SYNC, status: STATUS_OK });
 }
 
-function notifyFinishedDbChanges(bNewHistoryRows) {
+globalThis.notifyFinishedDbChanges = function notifyFinishedDbChanges(bNewHistoryRows) {
     broadcastMessage({ event: EVENTS.DB_CHANGED, bNewHistoryRows: bNewHistoryRows || false, status: STATUS_OK });
 }
 
-function handleSyncDB(request, sendResponseParam, bDontCallLoadSB) {
+globalThis.handleSyncDB = function handleSyncDB(request, sendResponseParam, bDontCallLoadSB) {
 
     function worker() {
         handleSyncDBWorker(request, sendResponseParam);
@@ -216,7 +216,7 @@ function handleSyncDB(request, sendResponseParam, bDontCallLoadSB) {
         worker();
 }
 
-function handleSyncDBWorker(request, sendResponseParam) {
+globalThis.handleSyncDBWorker = function handleSyncDBWorker(request, sendResponseParam) {
     var retConfig = request.config;
     if (retConfig === undefined) {
         sendResponseParam({ status: "not configured" });
@@ -401,9 +401,9 @@ function handleSyncDBWorker(request, sendResponseParam) {
     });
 }
 
-var g_strLastWriteSyncStatus = STATUS_OK;
+globalThis.g_strLastWriteSyncStatus = STATUS_OK;
 
-function decrementWriteSyncLock(bDecrementWrite) {
+globalThis.decrementWriteSyncLock = function decrementWriteSyncLock(bDecrementWrite) {
     if (bDecrementWrite) {
         assert(g_cWriteSyncLock > 0);
         g_cWriteSyncLock--;
@@ -412,7 +412,7 @@ function decrementWriteSyncLock(bDecrementWrite) {
 }
 
 
-function startWriteSync(idSsUser, idUserSheetTrello) {
+globalThis.startWriteSync = function startWriteSync(idSsUser, idUserSheetTrello) {
     if (g_cFullSyncLock <=0) {
         logPlusError("bad g_cFullSyncLock"); //should never happen
 		return;
@@ -445,7 +445,7 @@ function startWriteSync(idSsUser, idUserSheetTrello) {
 		});
 }
 
-function setLastWriteStatus(status) {
+globalThis.setLastWriteStatus = function setLastWriteStatus(status) {
     //patch sync status with new write status
     if (status != STATUS_OK)
         status = status + ".\nMake sure the spreadsheet is shared with Write permission to you.";
@@ -463,7 +463,7 @@ function setLastWriteStatus(status) {
     });
 }
 
-function appendRowsToSpreadsheet(rows, iRow, idSsUser, idUserSheetTrello, response) {
+globalThis.appendRowsToSpreadsheet = function appendRowsToSpreadsheet(rows, iRow, idSsUser, idUserSheetTrello, response) {
 	if (rows.length == iRow) {
 		if (rows.length == 0)
 		    setLastWriteStatus(STATUS_OK);
@@ -482,7 +482,7 @@ function appendRowsToSpreadsheet(rows, iRow, idSsUser, idUserSheetTrello, respon
 	});
 }
 
-function dateToSpreadsheetString(date) {
+globalThis.dateToSpreadsheetString = function dateToSpreadsheetString(date) {
 	// M/D/YYYY H:M:S review zig: make it customizable, but its hard given google spreadsheet inability to control its format.
 	var year = date.getFullYear();
 	var month = date.getMonth() + 1;
@@ -495,7 +495,7 @@ function dateToSpreadsheetString(date) {
 	return ret;
 }
 
-function appendRowToSpreadsheet(row, idSsUser, idUserSheetTrello, sendResponse) {
+globalThis.appendRowToSpreadsheet =function appendRowToSpreadsheet(row, idSsUser, idUserSheetTrello, sendResponse) {
     //note this serializes all appends, so we dont overwhelm google quotas
 	var date = new Date(row.date * 1000);
 	var atom = makeRowAtom(dateToSpreadsheetString(date), row.board, row.card, row.spent, row.est,
@@ -507,7 +507,7 @@ function appendRowToSpreadsheet(row, idSsUser, idUserSheetTrello, sendResponse) 
 	}, atom);
 }
 
-function appendLogToPublicSpreadsheet(message, sendResponse) {
+globalThis.appendLogToPublicSpreadsheet = function appendLogToPublicSpreadsheet(message, sendResponse) {
     //note this serializes all appends, so we dont overwhelm google quotas
     assert(false); //no longer used
 	var atom = makeMessageAtom(message);
@@ -521,7 +521,7 @@ function appendLogToPublicSpreadsheet(message, sendResponse) {
  *
  * returns READ-ONLY rows. use cloneObject if you want to modify it, else changes fail without error.
  **/
-function handleGetReport(request, sendResponse, bAllowWhileOpening, cRetries) {
+globalThis.handleGetReport = function handleGetReport(request, sendResponse, bAllowWhileOpening, cRetries) {
     var cRetriesStart = 8;
     if (cRetries === undefined)
         cRetries = cRetriesStart; //first time
@@ -556,8 +556,8 @@ function handleGetReport(request, sendResponse, bAllowWhileOpening, cRetries) {
 	});
 }
 
-var g_regexDateParseRow = null;
-function parseNewHistoryRow(rowIn) {
+globalThis.g_regexDateParseRow = null;
+globalThis.parseNewHistoryRow = function parseNewHistoryRow(rowIn) {
     var dummyColumn = "dummyPlusForTrelloColumn"; //simplifies algorithm below
     // var strContentsOrig = rowIn.content.$t;
     var strContentsOrig = rowIn.content;
@@ -636,7 +636,7 @@ function parseNewHistoryRow(rowIn) {
 	return obj;
 }
 
-function cleanupStringSpreadsheet(str) {
+globalThis.cleanupStringSpreadsheet = function cleanupStringSpreadsheet(str) {
 	if (typeof (str) != 'string')
 		return str;
 	str = str.trim();
@@ -645,7 +645,7 @@ function cleanupStringSpreadsheet(str) {
 	return str;
 }
 
-function processNewRows(rowsInput, sendResponse, ssInfo) {
+globalThis.handleMakeNonRecurring = function processNewRows(rowsInput, sendResponse, ssInfo) {
     var rows = rowsInput.map(parseNewHistoryRow);
 	
 	insertIntoDB(rows, sendResponse, ssInfo);
@@ -653,7 +653,7 @@ function processNewRows(rowsInput, sendResponse, ssInfo) {
 }
 
 
-function handleMakeNonRecurring(tx, idCard) {
+globalThis.handleMakeNonRecurring = function handleMakeNonRecurring(tx, idCard) {
     var sqlUpdateEtype = "UPDATE HISTORY set eType= CASE when est<0 then " +
         ETYPE_DECR + " else  case when est>0 then " +
         ETYPE_INCR + " else " +
@@ -676,7 +676,7 @@ OR (est<>0 AND comment LIKE '%" + g_prefixCommentTransfer + "%')";
 }
 
 
-function handleMakeRecurring(tx, idCard) {
+globalThis.handleMakeRecurring = function handleMakeRecurring(tx, idCard) {
     var sqlUpdateEtype = "update history set eType=" +
         ETYPE_NEW + " where idCard = ? and eType <> " +
         ETYPE_NEW + " and est <> 0";
@@ -690,7 +690,7 @@ function handleMakeRecurring(tx, idCard) {
 
 
 
-function handleCardCreatedUpdatedMoved(data, rowParam, bVerifyBoardIsCardsBoard, tx, callback) {
+globalThis.handleCardCreatedUpdatedMoved = function handleCardCreatedUpdatedMoved(data, rowParam, bVerifyBoardIsCardsBoard, tx, callback) {
     var row = rowParam;
     var strExecute = "SELECT dateSzLastTrello, idCard, idBoard, name from CARDS where idCard=?";
 	var values = [row.idCard];
@@ -799,7 +799,7 @@ function handleCardCreatedUpdatedMoved(data, rowParam, bVerifyBoardIsCardsBoard,
 	});
 }
 
-function handleRecurringChange(tx, idCard, nameOld, nameNew) {
+globalThis.handleRecurringChange = function handleRecurringChange(tx, idCard, nameOld, nameNew) {
     var bOldR = (nameOld.indexOf("[R]") >= 0);
     if (typeof (nameNew) == "undefined" || !nameNew.indexOf)
         return; //hack: due to an issue before v5.4.92, plus saved pending rows without a card title so it ended up as null.
@@ -813,7 +813,7 @@ function handleRecurringChange(tx, idCard, nameOld, nameNew) {
 }
 
 
-function handleUpdateCardBalances(rowParam, rowidParam, tx, nameCard, eTypeRow) {
+globalThis.handleUpdateCardBalances = function handleUpdateCardBalances(rowParam, rowidParam, tx, nameCard, eTypeRow) {
     var row = rowParam;
     if (row.spent == 0 && row.est == 0) //see updateCardRecurringStatusInHistory, handleMakeNonRecurring usage of min(rowid)
         return;
@@ -864,7 +864,7 @@ function handleUpdateCardBalances(rowParam, rowidParam, tx, nameCard, eTypeRow) 
 	);
 }
 
-function loadBackgroundOptions(callback) {
+globalThis.loadBackgroundOptions = function loadBackgroundOptions(callback) {
 
     loadSharedOptions(function () {
         if (!g_bEnableTrelloSync || g_bDisableSync) {
@@ -874,13 +874,13 @@ function loadBackgroundOptions(callback) {
     });
 }
 
-function insertIntoDB(rows, sendResponse, ssInfo) {
+globalThis.insertIntoDB = function insertIntoDB(rows, sendResponse, ssInfo) {
     loadBackgroundOptions(function () {
         insertIntoDBWorker(rows, sendResponse, ssInfo);
     });
 }
 
-function insertIntoDBWorker(rows, sendResponse, ssInfo, bFromTrelloComments) {
+globalThis.insertIntoDBWorker = function insertIntoDBWorker(rows, sendResponse, ssInfo, bFromTrelloComments) {
     assert(g_db);
     var i = 0;
     var idMemberMapByName = {}; //populated at the beginning with all existing users by name
@@ -1096,7 +1096,7 @@ function insertIntoDBWorker(rows, sendResponse, ssInfo, bFromTrelloComments) {
 	start();
 }
 
-function createNewUser(nameUser, tx) {
+globalThis.createNewUser = function createNewUser(nameUser, tx) {
     //insert a new fake user. Note that user.dateSzLastTrello is set to empty so that its "less" than any future date captured from a card comment
     tx.executeSql("INSERT OR IGNORE INTO USERS (idMemberCreator,username, dateSzLastTrello) VALUES (?,?,?)", [g_prefixCustomUserId + nameUser, nameUser, ""],
                             function (tx2, resultSet) {
@@ -1114,7 +1114,7 @@ function createNewUser(nameUser, tx) {
  * this code is tricky because rows sometimes refer to previous rows that were just commited, and sometimes
  * needs to undo changes.
  **/
-function handleBoardCommand(rowInnerParam, rowidInner, tx, bThrowErrors, callbackOnError) {
+globalThis.handleBoardCommand = function handleBoardCommand(rowInnerParam, rowidInner, tx, bThrowErrors, callbackOnError) {
 	//note on mark balances. defining sums of S/E by history rowid makes it a strict mark that cant be changed with back-reporting (-3d etc)
 	var rowInner = rowInnerParam;
 	var rowidHistory = rowidInner;
@@ -1224,7 +1224,7 @@ function handleBoardCommand(rowInnerParam, rowidInner, tx, bThrowErrors, callbac
 	}
 }
 
-function handleWriteLogToPlusSupport(request, sendResponse) {
+globalThis.handleWriteLogToPlusSupport = function handleWriteLogToPlusSupport(request, sendResponse) {
     var sql = "select date,message FROM LOGMESSAGES order by date DESC"; //desc because it could be truncated on a long log. We want to receive the latest entries.
     var query = { sql: sql, values: [] };
     handleGetReport(query,
@@ -1253,7 +1253,7 @@ function handleWriteLogToPlusSupport(request, sendResponse) {
         true);
 }
 
-function handleDeleteAllLogMessages(request, sendResponse) {
+globalThis.handleDeleteAllLogMessages = function handleDeleteAllLogMessages(request, sendResponse) {
 	var db = g_db;
 	var ret = { status: "" };
 	if (db == null) {
@@ -1330,7 +1330,7 @@ async function handleDeleteDB(request, sendResponseParam) {
 }
 
 
-function insertLogMessages(log, callback) {
+globalThis.insertLogMessages = function insertLogMessages(log, callback) {
 	var ret = { status: "" };
 	var db = g_db;
 	if (db == null) {
@@ -1381,7 +1381,7 @@ function insertLogMessages(log, callback) {
 	});
 }
 
-function startWritePublicLog(messages) {
+globalThis.startWritePublicLog = function startWritePublicLog(messages) {
     var merged = messages.join("\n\n");
     var maxLength = 4000;
     if (merged.length > maxLength)
@@ -1390,7 +1390,7 @@ function startWritePublicLog(messages) {
     window.open(urlForm,"_blank");
 }
 
-function convertDowStart(dowStart,dowDelta, sendResponse, response) {
+globalThis.convertDowStart = function convertDowStart(dowStart,dowDelta, sendResponse, response) {
     if (!g_db) {  //dont use isDbOpened since its called while opening
         var error = "db not open";
         logPlusError(error);
@@ -1447,13 +1447,13 @@ function convertDowStart(dowStart,dowDelta, sendResponse, response) {
 	});
 }
 
-var g_bOpeningDb = false;
+globalThis.g_bOpeningDb = false;
 
-function rawOpenDb() {
+globalThis.rawOpenDb = function rawOpenDb() {
     return openDatabase('trellodata');
 }
 
-function handleOpenDB(options, sendResponseParam, cRetries) {
+globalThis.handleOpenDB = function handleOpenDB(options, sendResponseParam, cRetries) {
     function doit() {
         loadBackgroundOptions(function () {
             handleOpenDBWorker(options, sendResponseParam, cRetries).then(() => {});
@@ -2073,7 +2073,7 @@ function handleOpenDB(options, sendResponseParam, cRetries) {
     }
 }
 
-function updateCardRecurringStatusInHistory(t) {
+globalThis.updateCardRecurringStatusInHistory = function updateCardRecurringStatusInHistory(t) {
     //see handleUpdateCardBalances for reference
 
     //used to set recurring cards to ETYPE_NONE, which makes reports on "new" versus "actual" not work correctly.
@@ -2124,7 +2124,7 @@ OR (est<>0 AND comment LIKE '%" + g_prefixCommentTransfer + "%')";
     });
 }
 
-function handleUpdateRowEtype(row, mapBalance, tx) {
+globalThis.handleUpdateRowEtype = function handleUpdateRowEtype(row, mapBalance, tx) {
 	var eType = ETYPE_NONE;
 	var key = row.idCard + "-" + row.user;
 	if (mapBalance[key]) {
@@ -2154,7 +2154,7 @@ function handleUpdateRowEtype(row, mapBalance, tx) {
 	}
 }
 
-function updateAllETypes(tx) {
+globalThis.updateAllETypes = function updateAllETypes(tx) {
 	var sql = "SELECT H.user, H.idCard, H.spent, H.est, H.eType,H.rowid, H.comment, C.name as nameCard FROM HISTORY H JOIN CARDS C ON H.idCard=C.idCard order by H.rowid ASC";
 	tx.executeSql(sql, [],
 			function (tx2, results) {
@@ -2171,17 +2171,17 @@ function updateAllETypes(tx) {
 			});
 }
 
-function makeRowGsxField(name, value) {
+globalThis.makeRowGsxField = function makeRowGsxField(name, value) {
 	return "<gsx:" + name + ">" + value + "</gsx:" + name + ">";
 }
 
-var g_regexXmlEscapeAmp = /&/g;
-var g_regexXmlEscapeLt = /</g;
-var g_regexXmlEscapeGt = />/g;
-var g_regexXmlEscapeQ = /"/g;
-var g_regexXmlEscapeApos = /'/g;
+globalThis.g_regexXmlEscapeAmp = /&/g;
+globalThis.g_regexXmlEscapeLt = /</g;
+globalThis.g_regexXmlEscapeGt = />/g;
+globalThis.g_regexXmlEscapeQ = /"/g;
+globalThis.g_regexXmlEscapeApos = /'/g;
 
-function xmlEscape(str) {
+globalThis.xmlEscape = function xmlEscape(str) {
     str = replaceString(str, g_regexXmlEscapeAmp, '&amp;');
     str = replaceString(str, g_regexXmlEscapeLt, '&lt;');
     str = replaceString(str, g_regexXmlEscapeGt, '&gt;');
@@ -2190,7 +2190,7 @@ function xmlEscape(str) {
     return str;
 }
 
-function makeRowAtom(date, board, card, spenth, esth, who, week, month, comment, idBoard, idCard, idtrello) {
+globalThis.makeRowAtom = function makeRowAtom(date, board, card, spenth, esth, who, week, month, comment, idBoard, idCard, idtrello) {
 	var cardurl = "https://trello.com/c/" + idCard;
 	var ssRowId = idtrello + "-" + idCard + "-" + idBoard;
 	var atom = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">';
@@ -2206,7 +2206,7 @@ function makeRowAtom(date, board, card, spenth, esth, who, week, month, comment,
 	return atom;
 }
 
-function makeMessageAtom(message) {
+globalThis.makeMessageAtom = function makeMessageAtom(message) {
 	var atom = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">';
 
 	atom += makeRowGsxField("message", "'" + message);
@@ -2214,12 +2214,12 @@ function makeMessageAtom(message) {
 	return atom;
 }
 
-function saveRowSSEndLastData(data) {
+globalThis.saveRowSSEndLastData = function saveRowSSEndLastData(data) {
     assert(typeof (data) == "object"); //old way stored number as string 
     localStorage.setItem("plus_row_ss_sync_end_last", JSON.stringify(data));
 }
 
-function getRowSSEndLastData(defaults) {
+globalThis.getRowSSEndLastData = function getRowSSEndLastData(defaults) {
     var data = localStorage.getItem("plus_row_ss_sync_end_last");
     if (typeof (data) !== "undefined" && typeof (data) == "string" && data.indexOf("{")!=0) {
         //older format that stored just the index of a single sheet as string (before 2016-12-12)

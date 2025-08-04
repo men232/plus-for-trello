@@ -1,21 +1,17 @@
+import "../background-glue.js";
 import { createExecutor } from "./createExecutor.mjs";
 import { createTransaction } from "./createTransaction.mjs";
 import { queueJob } from "./scheduler.mjs";
-import { SQLocal } from "./sqlocal/index.js";
+import { SQLocal } from "./sqlocal2/index.js";
 
 const getSystemValue = async (client, key) => {
-  const { rows } = await client.exec("SELECT value FROM _sysdata WHERE key=?", [
-    key,
-  ]);
+  const { rows } = await client.exec("SELECT value FROM _sysdata WHERE key=?", [key]);
 
   return rows?.[0]?.[0];
 };
 
 const setSystemValue = async (client, key, value) => {
-  await client.exec(
-    `INSERT OR REPLACE INTO _sysdata (key,value) VALUES (?,?)`,
-    [key, value]
-  );
+  await client.exec(`INSERT OR REPLACE INTO _sysdata (key,value) VALUES (?,?)`, [key, value]);
 };
 
 const setupSystemStorage = async (client) => {
@@ -33,10 +29,12 @@ const setupSystemStorage = async (client) => {
  * @typedef {import('./sqlite-wasm').Database} Database
  */
 
-window.openDatabase = async (name) => {
+globalThis.openDatabase = async (name) => {
   console.info("Loading and initializing SQLite3 module...");
 
-  const client = new SQLocal(`${name}.sqlite3`);
+  const client = new SQLocal({
+    databasePath: `${name}.sqlite3`,
+  });
 
   console.info("Database loaded.");
 
@@ -69,13 +67,7 @@ window.openDatabase = async (name) => {
 
   const api = {
     version,
-    changeVersion(
-      oldVersion,
-      newVersion,
-      handler,
-      errorCallback,
-      successCallback
-    ) {
+    changeVersion(oldVersion, newVersion, handler, errorCallback, successCallback) {
       const tx = _createTransaction();
 
       tx.onComplete.push(async () => {
@@ -101,9 +93,7 @@ window.openDatabase = async (name) => {
       tx.run();
     },
     executeSql(sql, values, callback, errorCallback) {
-      queueJob(() =>
-        _execute(sql, values, true).then(callback).catch(errorCallback)
-      );
+      queueJob(() => _execute(sql, values, true).then(callback).catch(errorCallback));
     },
     transaction(handler, errorCallback, successCallback) {
       const tx = _createTransaction();
@@ -126,9 +116,7 @@ window.openDatabase = async (name) => {
 
   if (api.version === "0") {
     console.warn("Cleanup database.");
-    const { rows } = await _execute(
-      "SELECT name FROM sqlite_master WHERE type='table'"
-    );
+    const { rows } = await _execute("SELECT name FROM sqlite_master WHERE type='table'");
 
     for (const row of rows) {
       if (row.name.startsWith("sqlite_")) continue;

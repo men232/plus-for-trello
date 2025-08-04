@@ -18,10 +18,30 @@ export function createExecutor(client) {
     let insertId = rawsLastRowId?.rows?.[0]?.[0] ?? null;
     let rowsAffected = rawsChanges?.rows?.[0]?.[0] ?? 0;
 
-    const rows = client.convertRowsToObjects(raws.rows, raws.columns);
+    const rows = convertRowsToObjects(raws.rows, raws.columns);
 
     const result = { rows, insertId, rowsAffected };
 
     return result;
   };
+}
+
+function isArrayOfArrays(rows) {
+  return !rows.some((row) => !Array.isArray(row));
+}
+
+function convertRowsToObjects(rows, columns) {
+  let checkedRows;
+  if (isArrayOfArrays(rows)) {
+    checkedRows = rows;
+  } else {
+    checkedRows = [rows];
+  }
+  return checkedRows.map((row) => {
+    const rowObj = {};
+    columns.forEach((column, columnIndex) => {
+      rowObj[column] = row[columnIndex];
+    });
+    return rowObj;
+  });
 }

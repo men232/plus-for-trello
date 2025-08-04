@@ -1,6 +1,6 @@
 /// <reference path="intellisense.js" />
 
-function commitTeamSyncData(tx, alldata) {
+globalThis.commitTeamSyncData = function commitTeamSyncData(tx, alldata) {
     var idTeam = null;
     var sql = "";
     var bChanged = false;
@@ -42,7 +42,7 @@ function commitTeamSyncData(tx, alldata) {
 }
 
 
-function commitBoardSyncData(tx, alldata) {
+globalThis.commitBoardSyncData = function commitBoardSyncData(tx, alldata) {
     var idBoard = null;
     var sql = "";
     var bChanged = false;
@@ -92,7 +92,7 @@ function commitBoardSyncData(tx, alldata) {
     return bChanged;
 }
 
-function commitBoardLabelsSyncData(tx, alldata) {
+globalThis.commitBoardLabelsSyncData = function commitBoardLabelsSyncData(tx, alldata) {
     var idLabel = null;
     var sql = "";
     var bChanged = false;
@@ -135,7 +135,7 @@ function commitBoardLabelsSyncData(tx, alldata) {
     return bChanged;
 }
 
-function commitListSyncData(tx, alldata) {
+globalThis.commitListSyncData = function commitListSyncData(tx, alldata) {
     var idList = null;
     var sql = "";
     var bChanged = false;
@@ -178,7 +178,7 @@ function commitListSyncData(tx, alldata) {
 }
 
 
-function commitCardSyncData(tx, alldata) {
+globalThis.commitCardSyncData = function commitCardSyncData(tx, alldata) {
     var idCard = null;
     var sql = "";
     var bChanged = false;
@@ -358,7 +358,7 @@ function commitCardSyncData(tx, alldata) {
     return bChanged;
 }
 
-function commitSESyncData(tx, alldata) {
+globalThis.commitSESyncData = function commitSESyncData(tx, alldata) {
     var bChanges = alldata.rgCommentsSE.length > 0;
     var sql = "SELECT idMemberCreator,username, dateSzLastTrello FROM USERS";
     tx.executeSql(sql, [], function (tx2, results) {
@@ -380,7 +380,7 @@ function commitSESyncData(tx, alldata) {
     return bChanges;
 }
 
-function preprocessUsersInAllData(rgCommentsSE, usersMap, idMemberMapByName) {
+globalThis.preprocessUsersInAllData = function preprocessUsersInAllData(rgCommentsSE, usersMap, idMemberMapByName) {
     //hash idMemberCreator -> last memberCreator data. Useful to have a quick list of users without having to query HISTORY
     //review zig: doesnt handle well deleted users, only renamed
     rgCommentsSE.forEach(function (action) {
@@ -416,7 +416,7 @@ function preprocessUsersInAllData(rgCommentsSE, usersMap, idMemberMapByName) {
     }
 }
 
-function commitSESyncDataWorker(tx, alldata, usersMap, idMemberMapByName) {
+globalThis.commitSESyncDataWorker = function commitSESyncDataWorker(tx, alldata, usersMap, idMemberMapByName) {
     var rows = [];
     var rgKeywords=g_optEnterSEByComment.rgKeywords;
     //sort before so usersMap is correct and we insert in date order. date is comment date, without yet applying any delta (-xd)
@@ -510,7 +510,7 @@ function commitSESyncDataWorker(tx, alldata, usersMap, idMemberMapByName) {
     return bCommited;
 }
 
-function insertPendingSERows(callback, bAllowWhileOpeningDb) {
+globalThis.insertPendingSERows = function insertPendingSERows(callback, bAllowWhileOpeningDb) {
     var request = { sql: "select iRow, obj FROM QUEUEHISTORY order by iRow ASC", values: [] };
     handleGetReport(request,
         function (responseReport) {

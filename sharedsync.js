@@ -1,17 +1,17 @@
 ﻿/// <reference path="intellisense.js" />
 //dont use const in this file, as mobile supports older browsers
 
-var g_deletedUserIdPrefix = "deleted"; //prefix for user id and user (when making up a username on deleted users)
-var PREFIX_ERROR_SE_COMMENT = "[error: "; //always use this to prefix error SE rows.
-var g_prefixCustomUserId = "customUser:";
-var g_dateMinCommentSE = new Date(2013, 6, 30); //exclude S/E before this (regular users didnt have this available back then), excludes my testing data from spent backend
-var g_dateMinCommentSEWithDateOverBackend = new Date(2014, 11, 3); //S/E with -xd will be ignored on x<-2 for non spent-backend admins, like the backend used to do
-var g_dateMinCommentSERelaxedFormat = new Date(2014, 11, 9);
-var g_dateMinTransferInPast = new Date(2017, 8, 15); //REVIEW cardtransfer
+globalThis.g_deletedUserIdPrefix = "deleted"; //prefix for user id and user (when making up a username on deleted users)
+globalThis.PREFIX_ERROR_SE_COMMENT = "[error: "; //always use this to prefix error SE rows.
+globalThis.g_prefixCustomUserId = "customUser:";
+globalThis.g_dateMinCommentSE = new Date(2013, 6, 30); //exclude S/E before this (regular users didnt have this available back then), excludes my testing data from spent backend
+globalThis.g_dateMinCommentSEWithDateOverBackend = new Date(2014, 11, 3); //S/E with -xd will be ignored on x<-2 for non spent-backend admins, like the backend used to do
+globalThis.g_dateMinCommentSERelaxedFormat = new Date(2014, 11, 9);
+globalThis.g_dateMinTransferInPast = new Date(2017, 8, 15); //REVIEW cardtransfer
 //regex is easy to break. check well your changes. consider newlines in comments. NOTE command could also be in the note.
 //For historical reasons, the command here only covers ^resetsync without 0/0. later we detect other commands.
 //                                       users               days           spent                      command           /        estimate              spaces   note
-var g_regexSEFull = new RegExp("^((\\s*@\\w+\\s+)*)((-[0-9]+)[dD]\\s+)?(([+-]?[0-9]*[.:]?[0-9]*)|(\\^[a-zA-Z]+))?\\s*(/?)\\s*([+-]?[0-9]*[.:]?[0-9]*)?(\\s*)(\\s[\\s\\S]*)?$");
+globalThis.g_regexSEFull = new RegExp("^((\\s*@\\w+\\s+)*)((-[0-9]+)[dD]\\s+)?(([+-]?[0-9]*[.:]?[0-9]*)|(\\^[a-zA-Z]+))?\\s*(/?)\\s*([+-]?[0-9]*[.:]?[0-9]*)?(\\s*)(\\s[\\s\\S]*)?$");
 
 function readTrelloCommentDataFromAction(action, rgKeywords, alldata, usersMap, idMemberMapByName) {
     var tableRet = [];

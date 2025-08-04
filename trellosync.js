@@ -1,20 +1,20 @@
 ﻿/// <reference path="intellisense.js" />
 
-var g_cMaxCallstack = 400; //400 is a safe size. Larger could cause stack overflow. must be large else is too slow in chrome canary.
-var g_cLimitActionsPerPage = 900; //the larger the better to avoid many round-trips and consuming more quota. trello allows up to 1000 but I feel safer with a little less.
-var g_bProcessCardCommentCopies = false; //Trello optionally copies card comment when making a card copy REVIEW must handle in comment parser. blocking: these dont appear inside board.actions so we would need a full rewrite of the sync algorithm.
-var g_bUpdateSyncNotificationProgress = false;
+globalThis.g_cMaxCallstack = 400; //400 is a safe size. Larger could cause stack overflow. must be large else is too slow in chrome canary.
+globalThis.g_cLimitActionsPerPage = 900; //the larger the better to avoid many round-trips and consuming more quota. trello allows up to 1000 but I feel safer with a little less.
+globalThis.g_bProcessCardCommentCopies = false; //Trello optionally copies card comment when making a card copy REVIEW must handle in comment parser. blocking: these dont appear inside board.actions so we would need a full rewrite of the sync algorithm.
+globalThis.g_bUpdateSyncNotificationProgress = false;
 
-var SQLQUERY_PREFIX_CARDDATA = "select dateCreated, dateDue, idBoard, name, dateSzLastTrello, idList, idLong, idCard, idShort, bArchived, bDeleted ";
-var SQLQUERY_PREFIX_LISTDATA = "select idBoard, name, dateSzLastTrello, idList, bArchived, pos ";
-var SQLQUERY_PREFIX_BOARDDATA = "select idBoard,idLong, name, dateSzLastTrello, idActionLast, bArchived, verDeepSync, idTeam, dateLastActivity ";
-var SQLQUERY_PREFIX_LABELDATA = "select idLabel,name, idBoardShort, color ";
-var SQLQUERY_PREFIX_LABELCARDDATA = "select idCardShort, idLabel ";
+globalThis.SQLQUERY_PREFIX_CARDDATA = "select dateCreated, dateDue, idBoard, name, dateSzLastTrello, idList, idLong, idCard, idShort, bArchived, bDeleted ";
+globalThis.SQLQUERY_PREFIX_LISTDATA = "select idBoard, name, dateSzLastTrello, idList, bArchived, pos ";
+globalThis.SQLQUERY_PREFIX_BOARDDATA = "select idBoard,idLong, name, dateSzLastTrello, idActionLast, bArchived, verDeepSync, idTeam, dateLastActivity ";
+globalThis.SQLQUERY_PREFIX_LABELDATA = "select idLabel,name, idBoardShort, color ";
+globalThis.SQLQUERY_PREFIX_LABELCARDDATA = "select idCardShort, idLabel ";
 
-var g_msDelayTrelloSearch = (1000 * 60 * 5); //trello takes sometimes over a minute to show changed cards in search, so use 5min as a safe delay
-var g_lastStatusSyncCache = {}; //needed for later checking if the last sync had errors easily (not async) statusRead, statusWrite, date could all be undefined)
+globalThis.g_msDelayTrelloSearch = (1000 * 60 * 5); //trello takes sometimes over a minute to show changed cards in search, so use 5min as a safe delay
+globalThis.g_lastStatusSyncCache = {}; //needed for later checking if the last sync had errors easily (not async) statusRead, statusWrite, date could all be undefined)
 
-var g_strKeyTokenTrelloLast = "plus_token_trello_last";
+globalThis.g_strKeyTokenTrelloLast = "plus_token_trello_last";
 
 /* array of cards where card = {
         status: "OK", //ignore it
@@ -22,21 +22,21 @@ var g_strKeyTokenTrelloLast = "plus_token_trello_last";
         nameOld: "(4) bb [5]",
         nameNew: "bb"
     }; */
-var g_rgUndoCardRename = null;
+globalThis.g_rgUndoCardRename = null;
 
 //REVIEW zig: idCardShort is a bad name, its really shortLink, and NOT idShort.
-function checkMaxCallStack(iLoop) {
+globalThis.checkMaxCallStack = function checkMaxCallStack(iLoop) {
     return (((iLoop+1) % g_cMaxCallstack) == 0);
 }
 
-function logTrelloSync(message) {
+globalThis.logTrelloSync = function logTrelloSync(message) {
     if (g_bIncreaseLogging)
         console.log(message);
 }
 
-var TOTAL_SYNC_STAGES = 9;
+globalThis.TOTAL_SYNC_STAGES = 9;
 
-var g_syncStatus = {
+globalThis.g_syncStatus = {
     postfixStage: "",
     strLastStatus: STATUS_OK,
     bSyncing: false,
@@ -124,7 +124,7 @@ var g_syncStatus = {
 };
 
 //review zig: tokenTrello is not used. some callers already pass null
-function processThreadedItemsSync(tokenTrello, items, onPreProcessItem, onProcessItem, onFinishedAll, bDontUpdateSyncStatus, needsProcessItemDelay) {
+globalThis.processThreadedItemsSync = function processThreadedItemsSync(tokenTrello, items, onPreProcessItem, onProcessItem, onFinishedAll, bDontUpdateSyncStatus, needsProcessItemDelay) {
 
     function onFinishedEach(status) {
         if (status == STATUS_OK) {
@@ -138,7 +138,7 @@ function processThreadedItemsSync(tokenTrello, items, onPreProcessItem, onProces
     processThreadedItems(tokenTrello, items, onPreProcessItem, onProcessItem, onFinishedAll, onFinishedEach, needsProcessItemDelay);
 }
 
-function handleGetTrelloCardData(request, sendResponseParam) {
+globalThis.handleGetTrelloCardData = function handleGetTrelloCardData(request, sendResponseParam) {
     var response = { status: "error" };
     getCardData(request.tokenTrello, request.idCard, request.fields, request.bBoardShortLink, callbackCard);
 
@@ -149,7 +149,7 @@ function handleGetTrelloCardData(request, sendResponseParam) {
     }
 }
 
-function handleGetTrelloBoardData(request, sendResponseParam) {
+globalThis.handleGetTrelloBoardData = function handleGetTrelloBoardData(request, sendResponseParam) {
     var response = { status: "error" };
     getBoardData(request.tokenTrello, false, request.idBoard, "fields=" + request.fields, callback);
 
@@ -160,7 +160,7 @@ function handleGetTrelloBoardData(request, sendResponseParam) {
     }
 }
 
-function makeLastStatusSync(statusRead, statusWrite, date) {
+globalThis.makeLastStatusSync = function makeLastStatusSync(statusRead, statusWrite, date) {
     if (!date)
         date = Date.now();
     g_lastStatusSyncCache = { statusRead: statusRead, statusWrite: statusWrite, date: date };
@@ -175,7 +175,7 @@ function makeLastStatusSync(statusRead, statusWrite, date) {
  * https://docs.google.com/drawings/d/1C6SaEjejg1e_NzfqhMpno5B5RyugtwCzdfH4XTyZmuw/edit?usp=sharing
  *
  **/
-function handleSyncBoards(request, sendResponseParam) {
+globalThis.handleSyncBoards = function handleSyncBoards(request, sendResponseParam) {
     loadBackgroundOptions(function () {
         function sendResponse(response) {
             g_syncStatus.strLastStatus = response.status;
@@ -222,7 +222,7 @@ function handleSyncBoards(request, sendResponseParam) {
     });
 }
 
-function handleSyncBoardsWorker(tokenTrello, bUserInitiated, sendResponseParam) {
+globalThis.handleSyncBoardsWorker = function handleSyncBoardsWorker(tokenTrello, bUserInitiated, sendResponseParam) {
     var tokenTrelloStored = localStorage.getItem(g_strKeyTokenTrelloLast);
 
     g_bUpdateSyncNotificationProgress = false; //reset
@@ -373,7 +373,7 @@ function handleSyncBoardsWorker(tokenTrello, bUserInitiated, sendResponseParam) 
     }
 }
 
-function populateTeams(teamsDb, boardsTrello) {
+globalThis.populateTeams = function populateTeams(teamsDb, boardsTrello) {
     boardsTrello.forEach(function (board) {
         var team = board.organization;
         var bChanged = false;
@@ -402,7 +402,7 @@ function populateTeams(teamsDb, boardsTrello) {
 }
 
 
-function processUndoAllCardsNameCleanup(tokenTrello, rgUndoCardRename, sendResponse) {
+globalThis.processUndoAllCardsNameCleanup = function processUndoAllCardsNameCleanup(tokenTrello, rgUndoCardRename, sendResponse) {
     handleShowDesktopNotification({
         notification: "Starting to UNDO card title renames.\nWatch progress by hovering the Chrome Plus icon.",
         timeout: 15000
@@ -468,7 +468,7 @@ function processUndoAllCardsNameCleanup(tokenTrello, rgUndoCardRename, sendRespo
     }
 }
 
-function processAllCardsNameCleanup(tokenTrello, bOnlyRenameCardsWithHistory, sendResponse) {
+globalThis.processAllCardsNameCleanup = function processAllCardsNameCleanup(tokenTrello, bOnlyRenameCardsWithHistory, sendResponse) {
     handleShowDesktopNotification({
         notification: "Starting to cleanup S/E from card titles.\nWatch progress by hovering the Chrome Plus icon.",
         timeout: 15000
@@ -550,7 +550,7 @@ function processAllCardsNameCleanup(tokenTrello, bOnlyRenameCardsWithHistory, se
         });
 }
 
-function completeMissingCardDateCreated(tokenTrello, alldata, sendResponse) {
+globalThis.completeMissingCardDateCreated = function completeMissingCardDateCreated(tokenTrello, alldata, sendResponse) {
     var request = { sql: SQLQUERY_PREFIX_CARDDATA + "FROM CARDS where dateCreated is NULL AND idLong is not NULL", values: [] };
     handleGetReport(request,
         function (responseReport) {
@@ -578,7 +578,7 @@ function completeMissingCardDateCreated(tokenTrello, alldata, sendResponse) {
         });
 }
 
-function completeMissingListCardData(tokenTrello, alldata, sendResponse) {
+globalThis.completeMissingListCardData = function completeMissingListCardData(tokenTrello, alldata, sendResponse) {
     var shortLinkCard = null;
     var cardsToFix=[];
     for (shortLinkCard in alldata.cards) {
@@ -652,7 +652,7 @@ function completeMissingListCardData(tokenTrello, alldata, sendResponse) {
     }
 }
 
-function completeMissingListData(tokenTrello, alldata, sendResponse) {
+globalThis.completeMissingListData = function completeMissingListData(tokenTrello, alldata, sendResponse) {
     var listsToFix = [];
     var mapHandled = {};
 
@@ -763,7 +763,7 @@ function completeMissingListData(tokenTrello, alldata, sendResponse) {
     }
 }
 
-function matchesCardShortLinkFromTrelloWelcomeBoard(shortLink) {
+globalThis.matchesCardShortLinkFromTrelloWelcomeBoard = function matchesCardShortLinkFromTrelloWelcomeBoard(shortLink) {
     var rg = [
         //all cards from both "welcome board" in https://trello.com/examples
         //1: https://trello.com/b/bKbdmCKB/welcome-board 
@@ -805,7 +805,7 @@ function matchesCardShortLinkFromTrelloWelcomeBoard(shortLink) {
     return false;
 }
 
-function preProcessActionsCaches(tokenTrello, actions, alldata, nextAction) {
+globalThis.preProcessActionsCaches = function preProcessActionsCaches(tokenTrello, actions, alldata, nextAction) {
     for (var i = 0; i < actions.length; i++) {
         var action = actions[i];
         var card = action.data.card;
@@ -894,7 +894,7 @@ function preProcessActionsCaches(tokenTrello, actions, alldata, nextAction) {
 }
 
 
-function listMissingCardShortlinks(actions, alldata) {
+globalThis.listMissingCardShortlinks = function listMissingCardShortlinks(actions, alldata) {
     var cardIds = [];
     var mapHandled = {};
     for (var i = 0; i < actions.length; i++) {
@@ -913,7 +913,7 @@ function listMissingCardShortlinks(actions, alldata) {
 }
 
 
-function getAllItemsFromDb(actions, alldata, sendStatus) {
+globalThis.getAllItemsFromDb = function getAllItemsFromDb(actions, alldata, sendStatus) {
     var iAction = -1;
     var cardsNotFound = {};
 
@@ -953,7 +953,7 @@ function getAllItemsFromDb(actions, alldata, sendStatus) {
     }
 }
 
-function populateDataCardFromDb(cardsNotFound, alldata, card, sendStatus, bAsync) {
+globalThis.populateDataCardFromDb = function populateDataCardFromDb(cardsNotFound, alldata, card, sendStatus, bAsync) {
     assert(card);
     var idShortCard = card.shortLink;
     var idLongCard = card.id;
@@ -1019,7 +1019,7 @@ function populateDataCardFromDb(cardsNotFound, alldata, card, sendStatus, bAsync
 }
 
 
-function getThisListFromDb(alldata, idList, onOk, sendError) {
+globalThis.getThisListFromDb = function getThisListFromDb(alldata, idList, onOk, sendError) {
     var request = { sql: SQLQUERY_PREFIX_LISTDATA+"FROM LISTS where idList=?", values: [idList] };
     handleGetReport(request,
         function (responseReport) {
@@ -1038,7 +1038,7 @@ function getThisListFromDb(alldata, idList, onOk, sendError) {
         });
 }
 
-function commitTrelloChanges(alldata, sendResponse) {
+globalThis.commitTrelloChanges = function commitTrelloChanges(alldata, sendResponse) {
     
     var bMadeChanges = false;
     g_syncStatus.setStage("Saving all", 1, true);
@@ -1086,7 +1086,7 @@ function commitTrelloChanges(alldata, sendResponse) {
 }
 
 
-function bUpdateAlldataCard(actionCur, cards, card, idBoard, dateCard, bForceUpdate) {
+globalThis.bUpdateAlldataCard = function bUpdateAlldataCard(actionCur, cards, card, idBoard, dateCard, bForceUpdate) {
     assert(idBoard); //can be unknown
     //actionCur can be null
     //warning: can get called (from search) with partial card details (only labels)
@@ -1187,7 +1187,7 @@ function bUpdateAlldataCard(actionCur, cards, card, idBoard, dateCard, bForceUpd
     return ret;
 }
 
-function bUpdateAlldataList(lists, list, idBoard, dateList) {
+globalThis.bUpdateAlldataList = function bUpdateAlldataList(lists, list, idBoard, dateList) {
     var ret = true;
     var listCur = lists[list.id];
     if (listCur) {
@@ -1216,7 +1216,7 @@ function bUpdateAlldataList(lists, list, idBoard, dateList) {
 }
 
 
-function processTrelloActions(tokenTrello, alldata, actions, boards, hasBoardAccessDirect, sendResponseParam) {
+globalThis.processTrelloActions = function processTrelloActions(tokenTrello, alldata, actions, boards, hasBoardAccessDirect, sendResponseParam) {
     var bProcessCommentSE = g_optEnterSEByComment.IsEnabled();
     var rgKeywords = [];
     var mapHandledCardCommand = {};
@@ -1678,7 +1678,7 @@ function processTrelloActions(tokenTrello, alldata, actions, boards, hasBoardAcc
     } //processCurrent
 }
 
-function processResetCardCommands(tokenTrello, alldata, sendResponse) {
+globalThis.processResetCardCommands = function processResetCardCommands(tokenTrello, alldata, sendResponse) {
     var limit = g_cLimitActionsPerPage;
 
     g_syncStatus.setStage("Processing cards with reset sync", alldata.rgCardResetData.length);
@@ -1767,7 +1767,7 @@ function processResetCardCommands(tokenTrello, alldata, sendResponse) {
     }
 }
 
-function getBoardData(tokenTrello, bOnlyCards, idBoard, params, callback, waitRetry) {
+globalThis.getBoardData = function getBoardData(tokenTrello, bOnlyCards, idBoard, params, callback, waitRetry) {
     //https://trello.com/docs/api/board/index.html
     var bParamsIsPath = (params && params.charAt(0) == "/");
     var url = "https://trello.com/1/boards/" + idBoard + (bOnlyCards? "/cards?":(bParamsIsPath?"":"?")) + params;
@@ -1835,7 +1835,7 @@ function getBoardData(tokenTrello, bOnlyCards, idBoard, params, callback, waitRe
 }
 
 
-function getListData(tokenTrello, idList, fields, callback, waitRetry) {
+globalThis.getListData = function getListData(tokenTrello, idList, fields, callback, waitRetry) {
     //https://trello.com/docs/api/list/index.html
 
     var url = "https://trello.com/1/lists/" + idList + "?fields=" + fields;
@@ -1893,15 +1893,15 @@ function getListData(tokenTrello, idList, fields, callback, waitRetry) {
     xhr.send();
 }
 
-var BOARD_ACTIONS_LIST_BASE = "updateList,deleteCard,commentCard,createList,convertToCardFromCheckItem,createCard,copyCard,emailCard,moveCardToBoard,moveCardFromBoard,updateBoard,moveListFromBoard,moveListToBoard,updateCard";
-function buildBoardActionsList() {
+globalThis.BOARD_ACTIONS_LIST_BASE = "updateList,deleteCard,commentCard,createList,convertToCardFromCheckItem,createCard,copyCard,emailCard,moveCardToBoard,moveCardFromBoard,updateBoard,moveListFromBoard,moveListToBoard,updateCard";
+globalThis.buildBoardActionsList = function buildBoardActionsList() {
     var ret = BOARD_ACTIONS_LIST_BASE;
     if (g_bProcessCardCommentCopies)
         ret += ",copyCommentCard";
     return ret;
 }
 
-function getCardActions(tokenTrello, iCard, idCard, idBoard, limit, strDateBefore, actionsSkip, callback, waitRetry) {
+globalThis.getCardActions = function getCardActions(tokenTrello, iCard, idCard, idBoard, limit, strDateBefore, actionsSkip, callback, waitRetry) {
     //https://trello.com/docs/api/card/index.html
     //the API gets actions from newest to oldest always
     
@@ -1995,7 +1995,7 @@ function getCardActions(tokenTrello, iCard, idCard, idBoard, limit, strDateBefor
 }
 
 
-function getBoardActions(tokenTrello, iBoard, idBoard, limit, strDateBefore, strDateAfter, actionsSkip, callback, waitRetry) {
+globalThis.getBoardActions = function getBoardActions(tokenTrello, iBoard, idBoard, limit, strDateBefore, strDateAfter, actionsSkip, callback, waitRetry) {
     //https://developers.trello.com/advanced-reference/board#get-1-boards-board-id-actions
     //the API gets actions from newest to oldest always
     //closed==archived
@@ -2099,7 +2099,7 @@ function getBoardActions(tokenTrello, iBoard, idBoard, limit, strDateBefore, str
 }
 
 
-function getAllTrelloBoardActions(tokenTrello, alldata, boardsReport, boardsTrello, sendResponse, bUserInitiated) {
+globalThis.getAllTrelloBoardActions = function getAllTrelloBoardActions(tokenTrello, alldata, boardsReport, boardsTrello, sendResponse, bUserInitiated) {
     assert(boardsReport);
 
     if (false) { //debugging
@@ -2727,12 +2727,12 @@ function getAllTrelloBoardActions(tokenTrello, alldata, boardsReport, boardsTrel
 }
 
 
-function getBoardsLastInfo(tokenTrello, callback) {
+globalThis.getBoardsLastInfo = function getBoardsLastInfo(tokenTrello, callback) {
     getBoardsLastInfoWorker(tokenTrello, callback);
 }
 
 
-function getBoardsLastInfoWorker(tokenTrello, callback, waitRetry) {
+globalThis.getBoardsLastInfoWorker = function getBoardsLastInfoWorker(tokenTrello, callback, waitRetry) {
     //https://developers.trello.com/advanced-reference/member#get-1-members-idmember-or-username-boards
     var url = "https://trello.com/1/members/me/boards?filter=all&organization=true&organization_fields=displayName,name&fields=idOrganization,name,closed,shortLink,dateLastActivity&actions=" + buildBoardActionsList() + "&actions_limit=1&action_fields=date&action_memberCreator=false";
     var xhr = new XMLHttpRequest();
@@ -2787,17 +2787,17 @@ function getBoardsLastInfoWorker(tokenTrello, callback, waitRetry) {
     xhr.send();
 }
 
-var g_etDateCache = null;
-function earliest_trello_date() {
+globalThis.g_etDateCache = null;
+globalThis.earliest_trello_date = function earliest_trello_date() {
     if (!g_etDateCache)
         g_etDateCache = new Date(1).toISOString();
     return g_etDateCache;
 }
 
 
-var g_bDisplayedDSCWarning = false;
+globalThis.g_bDisplayedDSCWarning = false;
 
-function doSearchTrelloChanges(bUserInitiated, tokenTrello, idBoardsSearch, cDaysDelta, cCardsLimit, callback, waitRetry) {
+globalThis.doSearchTrelloChanges = function doSearchTrelloChanges(bUserInitiated, tokenTrello, idBoardsSearch, cDaysDelta, cCardsLimit, callback, waitRetry) {
     //https://developers.trello.com/advanced-reference/search
 
     //warning: card_fields must be the same as the fields we get in card actions, see bUpdateAlldataCard for relevant fields. Otherwise a search
@@ -2890,7 +2890,7 @@ function doSearchTrelloChanges(bUserInitiated, tokenTrello, idBoardsSearch, cDay
     xhr.send();
 }
 
-function getAllTeams(callback, waitRetry) {
+globalThis.getAllTeams = function getAllTeams(callback, waitRetry) {
     //https://trello.com/docs/api/board/index.html
 
     var url = "https://trello.com/1/members/me/organizations?fields=idBoards";
@@ -2949,7 +2949,7 @@ function getAllTeams(callback, waitRetry) {
     xhr.send();
 }
 
-function buildBoardsWithoutMe(callback) {
+globalThis.buildBoardsWithoutMe = function buildBoardsWithoutMe(callback) {
     if ((localStorage.getItem("plus_first_trello_sync_completed") || "") != "true") {
         callback({ status: "Before using this feature, 'First sync' needs to complete.\n\n'First sync' will complete automatically once you close the Plus help pane." });
         return;
@@ -2989,7 +2989,7 @@ function buildBoardsWithoutMe(callback) {
         });
 }
 
-function processBoardNames(boards,callback) {
+globalThis.processBoardNames = function processBoardNames(boards,callback) {
     processThreadedItemsSync(null, boards, null, onProcessItem, onFinishedAll);
 
     function onProcessItem(tokenTrello, board, iitem, postProcessItem) {

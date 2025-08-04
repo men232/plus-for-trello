@@ -1,10 +1,9 @@
 {
   "update_url": "https://clients2.google.com/service/update2/crx",
-
   "name": "__MSG_extName__",
   "short_name": "Plus for Trello (Fixed)",
   "version": "6.5.11",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "default_locale": "en",
   "description": "__MSG_extDescription__",
   "icons": {
@@ -12,9 +11,9 @@
     "48": "images/icon48.png",
     "128": "images/icon128.png"
   },
-  "offline_enabled": true,
   "background": {
-    "page": "background.html"
+    "service_worker": "background-worker.js",
+    "type": "module"
   },
   "homepage_url": "https://www.plusfortrello.com",
   "oauth2": {
@@ -25,17 +24,22 @@
       "https://www.googleapis.com/auth/chromewebstore.readonly"
     ]
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "19": "images/icon19.png"
     },
     "default_title": "Plus for Trello",
     "default_popup": "popup.html"
   },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": ["https://trello.com/*"],
+      "matches": [
+        "https://trello.com/*"
+      ],
       "js": [
         "libs/jquery.min.js",
         "libs/jquery-ui.custom.min.js",
@@ -77,15 +81,22 @@
       "run_at": "document_start"
     }
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "web_accessible_resources": [
-    "images/*.png",
-    "images/*.gif",
-    "*.html",
-    "manifest.json",
-    "css/images/*.gif",
-    "stripe-wrap.js",
-    "websql/**"
+    {
+      "resources": [
+        "images/*.png",
+        "images/*.gif",
+        "*.html",
+        "manifest.json",
+        "css/images/*.gif",
+        "stripe-wrap.js",
+        "offscreen.js",
+        "websql/**"
+      ],
+      "matches": [
+        "https://trello.com/*"
+      ]
+    }
   ],
   "optional_permissions": [
     "https://*.stripe.com/",
@@ -99,12 +110,14 @@
   "permissions": [
     "identity",
     "storage",
+    "offscreen",
     "cookies",
+    "webRequest",
     "unlimitedStorage",
     "notifications",
-    "webRequest",
-    "webRequestBlocking",
-    "declarativeNetRequest",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
     "https://trello.com/",
     "https://trello.com/1/*"
   ]

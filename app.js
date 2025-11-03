@@ -437,6 +437,7 @@ function testExtension(callback) {
       true
     ); //true to rethrow exceptions
   } catch (e) {
+    console.error(e);
     showExtensionUpgradedError(e);
   }
 }

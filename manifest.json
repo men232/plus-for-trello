@@ -99,12 +99,7 @@
     }
   ],
   "optional_permissions": [
-    "https://*.stripe.com/",
-    "https://*.cloudfunctions.net/",
     "clipboardWrite",
-    "https://spreadsheets.google.com/",
-    "https://ssl.google-analytics.com/",
-    "https://www.googleapis.com/",
     "bookmarks"
   ],
   "permissions": [

